@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Building Circuits That Do Things — CS Unit 1</title>
+
+<!-- ===== lesson manifest: read by the hub's sync script ===== -->
+<meta property="og:title" content="Building Circuits That Do Things">
+<meta property="og:description" content="How a pile of switches learns to add, choose and count. Adders, multiplexers, decoders — the parts inside your phone, your microwave and the scoreboard at the park.">
+<meta property="og:site_name" content="CS Unit 1 · CFBC">
+<meta name="description" content="Half and full adders, ripple carry, multiplexers, decoders, seven-segment displays and priority encoders — built up from things you already use every day.">
+<meta name="theme-color" content="#5A4B9C">
+<meta name="lesson:duration"   content="75 min">
+<meta name="lesson:difficulty" content="CAPE Core">
+<meta name="lesson:objectives" content="8">
+<meta name="lesson:questions"  content="30">
+<meta name="lesson:sections"   content="8">
+<meta name="lesson:topics"     content="Half adder,Full adder,Ripple carry,Multiplexer,Decoder,Encoder,Seven-segment,Binary addition">
+<meta name="lesson:activities" content="Adder bench,Guest list or ban list,Adder lab,Domino carry,HDMI switch,Microwave clock,Buzzer test,Unit test">
+<meta name="lesson:updated"    content="2026-09-15">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Work+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EDEFF2; --board:#FFFFFF; --ink:#16202C; --ink2:#556577; --ink3:#8996A5;
+  --line:#D2D9E1; --hot:#5A4B9C; --amber:#F2A93B; --violet:#5A4B9C; --mint:#118D77; --red:#E04B2F;
+  --lowbg:#DFE5EC; --hibg:#FFE9C7;
+  --shadow:0 1px 0 rgba(22,32,44,.06), 0 12px 28px -18px rgba(22,32,44,.5);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Work Sans",system-ui,sans-serif;font-size:17px;line-height:1.65;
+  background-image:linear-gradient(rgba(22,32,44,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(22,32,44,.03) 1px,transparent 1px);background-size:26px 26px}
+h1,h2,h3,h4{font-family:"Space Grotesk",system-ui,sans-serif;line-height:1.12;letter-spacing:-.02em;margin:0}
+p{margin:0 0 1em}
+.wrap{max-width:900px;margin:0 auto;padding:0 22px}
+.mono{font-family:"JetBrains Mono",monospace}
+:focus-visible{outline:3px solid var(--amber);outline-offset:3px;border-radius:4px}
+button{font:inherit}
+.hide{display:none!important}
+
+nav.top{position:sticky;top:0;z-index:50;background:rgba(237,239,242,.93);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav.top .wrap{display:flex;gap:4px;overflow-x:auto;padding:9px 22px}
+nav.top a{white-space:nowrap;text-decoration:none;color:var(--ink2);font-size:.84rem;font-weight:500;padding:6px 11px;border-radius:7px}
+nav.top a:hover{background:var(--board);color:var(--ink)}
+nav.top a.home{color:var(--hot);font-weight:600}
+
+.hero{padding:44px 0 14px}
+.eyebrow{font-family:"JetBrains Mono",monospace;font-size:.78rem;color:var(--hot);font-weight:700}
+.hero h1{font-size:clamp(2.1rem,6vw,3.6rem);font-weight:700;margin:12px 0 0}
+.hero .lede{max-width:57ch;color:var(--ink2);font-size:1.08rem;margin-top:16px}
+
+section{padding:52px 0 8px}
+section>.wrap>h2{font-size:clamp(1.6rem,4vw,2.2rem);margin-bottom:6px}
+.sub{color:var(--ink2);max-width:62ch;margin-bottom:26px}
+.panel{background:var(--board);border:1px solid var(--line);border-radius:14px;padding:22px;box-shadow:var(--shadow);margin-bottom:18px}
+.note{border-left:4px solid var(--violet);background:rgba(90,75,156,.06);border-radius:0 10px 10px 0;padding:14px 18px;margin:18px 0}
+.note.warn{border-left-color:var(--amber);background:#FFF6E6}
+.note.win{border-left-color:var(--mint);background:rgba(17,141,119,.07)}
+.note.real{border-left-color:var(--red);background:rgba(224,75,47,.06)}
+.note b{font-family:"Space Grotesk",sans-serif}
+.analogy{border-left:4px solid var(--amber);background:#FFF6E6;border-radius:0 10px 10px 0;padding:16px 18px;margin:0 0 20px}
+.analogy h4{font-size:1rem;margin-bottom:6px;color:#8A5B08}
+.analogy p{margin:0;font-size:.96rem;color:#5D4208}
+
+.btn{border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:9px;padding:10px 18px;font-size:.92rem;font-weight:600;cursor:pointer}
+.btn:hover{background:#0D1620}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.ghost:hover{background:var(--paper)}
+.btn.accent{background:var(--hot);border-color:var(--hot)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:16px}
+.feedback{margin-top:16px;padding:12px 16px;border-radius:10px;font-size:.94rem;display:none}
+.feedback.show{display:block}
+.feedback.good{background:rgba(17,141,119,.1);border-left:4px solid var(--mint)}
+.feedback.bad{background:rgba(224,75,47,.09);border-left:4px solid var(--red)}
+
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+@media (max-width:720px){.two{grid-template-columns:1fr}}
+
+/* bits & toggles */
+.bitrow{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.bit{width:40px;height:44px;border:2px solid var(--line);background:var(--lowbg);border-radius:9px;
+  font-family:"JetBrains Mono",monospace;font-weight:700;font-size:1.1rem;color:var(--ink3);cursor:pointer;transition:.15s}
+.bit[aria-pressed="true"]{background:var(--amber);border-color:#D89321;color:#2A1B00}
+.bit.ro{cursor:default}
+.bit.carry{width:32px;height:32px;font-size:.85rem;border-radius:50%}
+.bit.carry.on{background:var(--red);border-color:var(--red);color:#fff;box-shadow:0 0 0 6px rgba(224,75,47,.18)}
+.lbl{font-family:"JetBrains Mono",monospace;font-size:.8rem;color:var(--ink2);min-width:4.5em}
+.sum{font-family:"JetBrains Mono",monospace;font-size:1.05rem}
+.big{font-family:"Space Grotesk",sans-serif;font-size:2rem;font-weight:700;line-height:1}
+
+table.tt{border-collapse:collapse;width:100%;font-family:"JetBrains Mono",monospace;font-size:.87rem}
+table.tt th,table.tt td{border:1px solid var(--line);padding:5px 6px;text-align:center}
+table.tt th{background:var(--paper);font-weight:700;font-size:.76rem;color:var(--ink2)}
+table.tt td.out{font-weight:700}
+table.tt tr.hot td{background:var(--hibg)}
+table.tt tr.one td.out{background:rgba(17,141,119,.16)}
+table.tt tr.zero td.out{background:rgba(224,75,47,.12)}
+table.tt tr.pick{cursor:pointer}
+table.tt tr.sel td{background:rgba(90,75,156,.16);box-shadow:inset 3px 0 0 var(--violet)}
+
+.exprbar{font-family:"JetBrains Mono",monospace;font-size:1rem;background:var(--ink);color:#fff;border-radius:10px;padding:13px 16px;overflow-x:auto;white-space:nowrap}
+.exprbar .v{color:var(--amber)}
+.exprbar.sm{font-size:.86rem;padding:10px 13px}
+
+.chip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:7px 12px;font-family:"JetBrains Mono",monospace;font-size:.88rem;cursor:pointer;user-select:none}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.chip.ok{background:rgba(17,141,119,.14);border-color:var(--mint);color:#0B5F50}
+.chip.no{background:rgba(224,75,47,.12);border-color:var(--red);color:#8E2A17}
+.chip .x{border:0;background:rgba(0,0,0,.14);color:inherit;border-radius:50%;width:18px;height:18px;font-size:.7rem;cursor:pointer;display:grid;place-items:center;padding:0;line-height:1}
+.chiprow{display:flex;gap:8px;flex-wrap:wrap}
+
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.tab{border:1px solid var(--line);background:var(--board);border-radius:9px;padding:8px 15px;font-size:.89rem;cursor:pointer}
+.tab[aria-pressed="true"]{background:var(--violet);color:#fff;border-color:var(--violet)}
+
+.scope{width:100%;overflow-x:auto}
+.scope svg{display:block;min-width:460px;max-width:100%;height:auto}
+footer{margin-top:60px;border-top:1px solid var(--line);padding:26px 0 56px;color:var(--ink3);font-size:.86rem}
+</style>
+</head>
+<body>
+
+<nav class="top"><div class="wrap">
+  <a class="home" href="https://enoete.github.io/compsciu1_hub/">← Unit 1 hub</a>
+  <a href="#sop">SOP vs POS</a>
+  <a href="#adders">Adders</a>
+  <a href="#ripple">Ripple carry</a>
+  <a href="#mux">Multiplexers</a>
+  <a href="#decoder">Decoders</a>
+  <a href="#encoder">Encoders</a>
+  <a href="#test">Unit test</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">TOPIC 03 · COMPUTER ARCHITECTURE</div>
+  <h1>Building circuits that do things</h1>
+  <p class="lede">Your phone does not know what seven is. There is no little seven hiding anywhere inside it.
+  There are switches, on and off, wired together so cleverly that the right answer falls out the other end.
+  In this topic those switches stop being an exercise and start being real things: a calculator, a TV remote,
+  the clock on your microwave. Start by playing with the thing below. It adds. That is all it does, and everything
+  else your phone does is built on top of it.</p>
+
+  <div class="panel" style="margin-top:26px">
+    <h3 style="margin-bottom:4px">An adder. A real one.</h3>
+    <p style="font-size:.92rem;color:var(--ink2);margin-bottom:16px">Click any bit to flip it and the sum updates instantly.
+    Nothing here is a simulation of a calculator — this is the actual wiring pattern, and there is a copy of it in
+    every phone in the room.</p>
+    <div style="display:grid;gap:10px">
+      <div class="bitrow"><span class="lbl">carry</span><span id="hCarry" class="bitrow"></span></div>
+      <div class="bitrow"><span class="lbl">A</span><span id="hA" class="bitrow"></span><span class="sum" id="hAd"></span></div>
+      <div class="bitrow"><span class="lbl">B</span><span id="hB" class="bitrow"></span><span class="sum" id="hBd"></span></div>
+      <div style="border-top:1px solid var(--line);padding-top:10px" class="bitrow">
+        <span class="lbl">sum</span><span id="hS" class="bitrow"></span><span class="sum" id="hSd"></span></div>
+    </div>
+    <div class="btnrow" style="border-top:1px solid var(--line);padding-top:14px;margin-top:16px">
+      <button class="btn ghost" id="hRand">Random numbers</button>
+      <button class="btn ghost" id="hWorst">Worst case for carry</button>
+      <span class="mono" style="font-size:.85rem;color:var(--ink2)" id="hNote"></span>
+    </div>
+  </div>
+</div></header>
+
+<section id="sop"><div class="wrap">
+  <h2>The guest list and the ban list</h2>
+  <p class="sub">Last topic you learned to look at the 1s. There is a second way that looks at the 0s instead, and
+  sometimes it saves you an enormous amount of work. Which one you pick depends entirely on which list is shorter.</p>
+
+  <div class="analogy">
+    <h4>You are on the door at a party</h4>
+    <p>Two ways to do your job. You can hold a <b>guest list</b>: let them in if they are Shanice, <em>or</em> Kemoy,
+    <em>or</em> Tariq. Or you can hold a <b>ban list</b>: let everybody in as long as they are not Dwayne
+    <em>and</em> not Keisha. Same door. Same people get in. But if three people are invited out of a hundred,
+    you write a guest list. If ninety-seven are invited, you would be mad not to write the ban list instead.
+    That is the whole idea, and the maths below is just that idea with letters.</p>
+  </div>
+
+  <div class="panel">
+    <div class="tabs" id="sopTabs"></div>
+    <div class="two">
+      <div id="sopTableBox"></div>
+      <div>
+        <div id="sopSteps"></div>
+        <div class="exprbar sm" id="sopExpr" style="margin-top:14px"></div>
+        <div class="exprbar sm" id="sopOther" style="margin-top:8px;background:var(--paper);color:var(--ink2);border:1px solid var(--line)"></div>
+        <p style="font-size:.86rem;color:var(--ink2);margin-top:12px" id="sopCount"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="note warn"><b>The POS rule is the SOP rule with everything flipped — all four parts of it.</b>
+  Look at rows where the output is <span class="mono">0</span>, not 1. Inside a term, a <span class="mono">1</span> input
+  becomes primed and a <span class="mono">0</span> input stays plain — the opposite of SOP. The letters inside a term are
+  joined with <span class="mono">+</span>, not multiplied. And the terms themselves are multiplied together, not added.
+  Flip all four or you will get nonsense; flipping three out of four is the classic exam mistake.</div>
+</div></section>
+
+<section id="adders"><div class="wrap">
+  <h2>1 + 1 = 10, and that is not a typo</h2>
+  <p class="sub">In binary you run out of digits immediately. There is no "2" to write, so one plus one rolls over to
+  <span class="mono">10</span> — a zero with a one carried. Sound familiar? It is what happens at nine in normal
+  counting. Computers just hit the wall a lot sooner.</p>
+
+  <div class="analogy">
+    <h4>You already know how to do this</h4>
+    <p>Add 47 + 25 on paper. Seven and five is twelve, so you write the 2 and carry the 1. Then four, two, and that
+    carried 1 makes seven. Look at what you just did. The first column added <em>two</em> things. Every column after
+    it added <em>three</em> — two digits plus whatever got carried in. Those are two different jobs, so they need two
+    different circuits. The first one is called a half adder. The rest are full adders. You worked out the design of
+    a computer in primary school and nobody told you.</p>
+  </div>
+
+  <div class="panel">
+    <h3 style="margin-bottom:4px">Half adder</h3>
+    <p style="font-size:.93rem;color:var(--ink2)">Two inputs, two outputs. Sum is XOR, carry is AND.</p>
+    <div class="two" style="margin-top:14px">
+      <div id="haCtl"></div>
+      <div><div class="scope" id="haSvg"></div></div>
+    </div>
+    <div id="haTable" style="margin-top:16px;max-width:360px"></div>
+    <div class="note win" style="margin-bottom:0"><b>Nobody picked these gates. The maths picked them.</b>
+    When do you write down a 1? When exactly one of the two bits is a 1 — not both, not neither. That is literally
+    the description of an XOR gate. When do you carry? Only when both are 1. That is literally an AND gate.
+    Somebody sat down with the arithmetic, and the gates were already there waiting.</div>
+  </div>
+
+  <div class="panel">
+    <h3 style="margin-bottom:4px">Full adder</h3>
+    <p style="font-size:.93rem;color:var(--ink2)">Three inputs now, because a carry arrives from the column to the right.
+    Watch the internal wires light up.</p>
+    <div class="two" style="margin-top:14px">
+      <div id="faCtl"></div>
+      <div><div class="scope" id="faSvg"></div></div>
+    </div>
+    <div id="faTable" style="margin-top:16px"></div>
+    <div class="note" style="margin-bottom:0"><b>A full adder is just two half adders holding hands.</b>
+    The first one adds A and B. The second one takes that answer and adds the carry coming in from the right.
+    And if <em>either</em> of them produced a carry, a carry goes out — so you OR their two carries together. That is it.
+    Say it out loud once: two half adders and an OR gate. It is the kind of sentence that earns marks on its own.</div>
+  </div>
+</div></section>
+
+<section id="ripple"><div class="wrap">
+  <h2>Why your calculator is secretly a queue</h2>
+  <p class="sub">Line up four full adders and you can add any two numbers up to 15. There is one annoying catch:
+  each adder cannot start until the one on its right has finished and handed over its carry. Step through it below and
+  you will see a problem engineers have been fighting for seventy years.</p>
+
+  <div class="analogy">
+    <h4>The bucket brigade</h4>
+    <p>A house is on fire and four of you form a line from the standpipe. Everybody is standing there ready, hands out,
+    from the very first second. But you cannot pass a bucket you have not been handed yet. So even with four people all
+    ready at once, the first bucket still takes four passes to reach the fire. Nobody in that line is slow. The line
+    itself is the problem. Now imagine sixty-four people — that is what happens inside your laptop every time it adds
+    two numbers.</p>
+  </div>
+
+  <div class="panel">
+    <div id="rcCtl"></div>
+    <div id="rcStage" style="margin-top:18px"></div>
+    <div class="btnrow">
+      <button class="btn accent" id="rcStep">Step the carry</button>
+      <button class="btn ghost" id="rcRun">Run it</button>
+      <button class="btn ghost" id="rcReset">Reset</button>
+    </div>
+    <div class="feedback" id="rcFb"></div>
+  </div>
+
+  <div class="note real"><b>So how did they fix it?</b> Somebody clever realised you can work out <em>every</em> carry
+  at the same time, straight from the original numbers, instead of waiting for them to shuffle down the line.
+  It is called carry-lookahead, it uses a pile more gates, and it is much faster. Notice the trade: spend more hardware,
+  get more speed. You are going to meet that trade for the rest of your life in this subject. You do not need to build
+  one. You do need to know why somebody had to.</div>
+</div></section>
+
+<section id="mux"><div class="wrap">
+  <h2>Choosing one thing out of many</h2>
+  <p class="sub">A multiplexer — everyone says "MUX" — is a switch built out of gates. Lots of wires go in, one comes
+  out, and a couple of extra wires decide which one gets through. There is one bit of maths to remember and it is small:
+  <span class="mono">2ⁿ</span> inputs need <span class="mono">n</span> select lines.</p>
+
+  <div class="analogy">
+    <h4>The box behind the TV with too many things plugged into it</h4>
+    <p>PlayStation, cable box, Firestick, somebody's laptop. One TV, one socket, one little button on the side.
+    Press it and a different thing shows up on screen. Here is the part worth noticing: the other three are still
+    plugged in and still sending their picture down the wire the whole time. Nothing got unplugged. Nothing got copied.
+    The box just <em>decided which wire to listen to</em>. That is a multiplexer. Your phone's processor makes that
+    exact decision about a billion times a second.</p>
+  </div>
+
+  <div class="panel">
+    <div class="two">
+      <div id="muxCtl"></div>
+      <div><div class="scope" id="muxSvg"></div>
+        <div class="exprbar sm" id="muxExpr" style="margin-top:12px"></div></div>
+    </div>
+    <div id="muxTable" style="margin-top:16px;max-width:420px"></div>
+  </div>
+
+  <div class="panel">
+    <h3 style="margin-bottom:4px">The cheat code</h3>
+    <p style="font-size:.94rem;color:var(--ink2)">Here is something slightly ridiculous. A MUX can pretend to be
+    <em>any</em> logic gate you want. Plug your two inputs into the select lines, then just write the answer column of
+    the truth table straight onto the data inputs. No designing. No gates. You literally copy the answers in and the
+    MUX does the rest. Try it — make it into an XOR.</p>
+    <div id="muxFn" style="margin-top:14px"></div>
+    <div class="feedback" id="muxFb"></div>
+  </div>
+</div></section>
+
+<section id="decoder"><div class="wrap">
+  <h2>One code in, one thing happens</h2>
+  <p class="sub">A decoder is the opposite of a MUX. A short code goes in, and exactly one output line switches on —
+  never two, never none. It is what turns "button E4" into "drop <em>that</em> packet of chips and nothing else".</p>
+
+  <div class="analogy">
+    <h4>The vending machine at school</h4>
+    <p>You press E and then 4. Two little inputs, that is all the machine gets. Somewhere inside, one spiral out of
+    forty starts turning and your chips drop. Not two spirals. Not the whole machine emptying itself onto the floor.
+    Exactly one. How? Every spiral has its own AND gate, and that gate is wired so it only fires for one specific code
+    and ignores everything else. Forty spirals, forty AND gates, all listening, one answering. That is a decoder.</p>
+  </div>
+
+  <div class="panel">
+    <div class="two">
+      <div id="decCtl"></div>
+      <div><div class="scope" id="decSvg"></div></div>
+    </div>
+    <div id="decTable" style="margin-top:16px;max-width:460px"></div>
+  </div>
+
+  <div class="panel">
+    <h3 style="margin-bottom:4px">The microwave clock</h3>
+    <p style="font-size:.93rem;color:var(--ink2)">Here is a decoder you have stared at your whole life. Those chunky
+    numbers on a microwave, an oven, a petrol pump, a digital alarm clock — every digit is seven little bars, and a
+    decoder decides which bars light up. Flip the four input bits and watch a number appear out of nothing.</p>
+    <div class="two" style="margin-top:16px;align-items:center">
+      <div id="ssCtl"></div>
+      <div style="display:grid;place-items:center"><div id="ssDisplay"></div></div>
+    </div>
+    <div id="ssSegs" style="margin-top:16px"></div>
+    <div class="note real" style="margin-bottom:0"><b>Go and look at one tonight.</b> Seriously — microwave, oven,
+    alarm clock, the pump at the gas station, the scoreboard at the park. Same seven bars every time, same chip design
+    since the 1970s, still made by the million. Look at the top bar on its own: it is lit for 0, 2, 3, 5, 6, 7, 8 and 9,
+    and dark for 1 and 4. That on-off pattern is just a truth table, and you already know how to turn one of those into
+    gates. Do that seven times and you have built the whole chip.</div>
+  </div>
+</div></section>
+
+<section id="encoder"><div class="wrap">
+  <h2>The buzzer that lies to you</h2>
+  <p class="sub">An encoder runs a decoder backwards: lots of buttons in, a short code out. Straightforward enough —
+  right up until two people press at the same time, at which point it does something genuinely stupid.</p>
+
+  <div class="analogy">
+    <h4>Four people on a quiz show and one scoreboard</h4>
+    <p>Everybody has a buzzer. The scoreboard shows who got in first as a little two-bit number. Player 1 and Player 2
+    slam their buzzers at the same instant — and the board lights up <b>Player 3</b>. Player 3 has not touched anything.
+    Player 3 is confused. The audience is booing. What happened is that a plain encoder does not <em>choose</em> between
+    them; it mashes both their codes together and produces a third number that means somebody else entirely.
+    The fix is to agree a rule in advance: highest number wins, everyone else gets ignored. That is a priority encoder.
+    Press two buttons below and catch the plain one lying.</p>
+  </div>
+
+  <div class="panel">
+    <div id="encCtl"></div>
+    <div class="two" style="margin-top:18px">
+      <div><h4 style="font-size:1rem;margin-bottom:8px;color:var(--red)">Plain encoder</h4><div id="encPlain"></div></div>
+      <div><h4 style="font-size:1rem;margin-bottom:8px;color:var(--mint)">Priority encoder</h4><div id="encPri"></div></div>
+    </div>
+    <div class="feedback" id="encFb"></div>
+  </div>
+
+  <div class="note warn"><b>And there is a second bug, which is almost funnier.</b> If nobody presses anything at all,
+  the output reads <span class="mono">00</span>. But <span class="mono">00</span> is also the code for Player 0.
+  The board cannot tell the difference between "Player 0 buzzed" and "the room is empty". Real encoders bolt on an extra
+  wire called <b>valid</b> that just says yes-somebody-pressed-something. Those two bugs are the standard exam answer
+  for "give two limitations of a basic encoder", so they are worth the thirty seconds.</div>
+</div></section>
+
+<section id="test"><div class="wrap">
+  <h2>Unit test</h2>
+  <p class="sub">Thirty questions. Nothing is saved, nothing is sent anywhere, nobody sees your score but you —
+  so get it wrong as many times as you like. Every answer comes with a proper explanation, and at the end you get a
+  breakdown showing exactly which bit to go back and look at.</p>
+
+  <div id="testIntro" class="panel">
+    <h3 style="margin-bottom:10px">What it covers</h3>
+    <ul style="color:var(--ink2);font-size:.96rem;margin:0;padding-left:20px">
+      <li><b>Part A</b> — guest list or ban list (7 questions)</li>
+      <li><b>Part B</b> — adding (11)</li>
+      <li><b>Part C</b> — choosing (6)</li>
+      <li><b>Part D</b> — decoding and encoding (6)</li>
+    </ul>
+    <p style="font-size:.9rem;color:var(--ink3);margin-top:14px">Grab a scrap of paper. A couple of these are much
+    easier if you scribble the columns out than if you try to hold it all in your head.</p>
+    <div class="btnrow"><button class="btn accent" id="testStart">Start the test</button></div>
+  </div>
+
+  <div id="testRun" class="hide">
+    <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-bottom:18px">
+      <span class="mono" id="testPos"></span>
+      <div style="flex:1 1 180px;height:9px;background:var(--lowbg);border-radius:999px;overflow:hidden;min-width:140px">
+        <i id="testMeter" style="display:block;height:100%;background:var(--hot);width:0;transition:width .3s"></i></div>
+      <span class="mono" id="testScore"></span>
+    </div>
+    <div class="panel" id="qcard" style="margin-bottom:0"></div>
+    <div class="btnrow"><button class="btn ghost" id="testQuit">End test early</button></div>
+  </div>
+
+  <div id="testDone" class="hide">
+    <div class="panel" style="text-align:center;padding:34px 22px">
+      <div class="big" style="font-size:4.2rem" id="doneScore"></div>
+      <div class="mono" style="font-size:1.1rem;color:var(--ink2)" id="doneGrade"></div>
+      <p style="max-width:44ch;margin:18px auto 0;color:var(--ink2)" id="doneMsg"></p>
+      <div style="display:grid;gap:10px;max-width:470px;margin:26px auto 0;text-align:left" id="doneBreak"></div>
+      <div class="btnrow" style="justify-content:center">
+        <button class="btn accent" id="retryWrong">Retry only what I missed</button>
+        <button class="btn ghost" id="retryAll">Start over</button>
+        <button class="btn ghost" id="reviewAll">Review every question</button>
+      </div>
+    </div>
+    <div id="reviewBox"></div>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  Computer Science Unit 1 · Clarence Fitzroy Bryant College · Topic 3 of the unit.
+  Built for the classroom — nothing you do on this page is saved or sent anywhere.
+</div></footer>
+
+<script>
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const PR='\u2032';                                    // prime glyph
+function rowsFor(n){const o=[];for(let i=0;i<(1<<n);i++)o.push([...Array(n)].map((_,j)=>(i>>(n-1-j))&1));return o;}
+function ttHTML(vars,outs,o={}){
+  const rows=rowsFor(vars.length);
+  const head=vars.map(v=>`<th>${esc(v)}</th>`).join('')+(o.outs||[o.outName||'Z']).map(x=>`<th>${esc(x)}</th>`).join('');
+  const body=rows.map((b,i)=>{
+    const cls=[o.pick?'pick':'',o.hot===i?'hot':'',(o.sel||[]).includes(i)?'sel':'',
+               o.mark==='one'&&outs[i]?'one':'',o.mark==='zero'&&!outs[i]?'zero':''].join(' ');
+    const extra=(o.extraCols||[]).map(c=>`<td>${c[i]}</td>`).join('');
+    return `<tr class="${cls}" data-row="${i}">${b.map(x=>`<td>${x}</td>`).join('')}<td class="out">${outs[i]}</td>${extra}</tr>`;
+  }).join('');
+  return `<table class="tt"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+}
+function gateBody(type,x,y,w,h){
+  const bub=/^(NAND|NOR|XNOR|NOT)$/.test(type); let d='',ex='';
+  if(type==='AND'||type==='NAND') d=`M${x},${y} h${w*0.45} a${h/2},${h/2} 0 0 1 0,${h} h-${w*0.45} z`;
+  else if(type==='NOT') d=`M${x},${y} L${x+w},${y+h/2} L${x},${y+h} z`;
+  else{ d=`M${x},${y} Q${x+w*0.72},${y} ${x+w},${y+h/2} Q${x+w*0.72},${y+h} ${x},${y+h} Q${x+w*0.32},${y+h/2} ${x},${y} z`;
+        if(type==='XOR'||type==='XNOR') ex+=`<path d="M${x-7},${y} Q${x+w*0.25},${y+h/2} ${x-7},${y+h}" fill="none" stroke="currentColor" stroke-width="2.5"/>`; }
+  if(bub) ex+=`<circle cx="${x+w+5}" cy="${y+h/2}" r="5" fill="var(--board)" stroke="currentColor" stroke-width="2.5"/>`;
+  return {d,ex,outX:x+w+(bub?10:0)};
+}
+const wire=(x1,y1,x2,y2,on)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${on?'var(--amber)':'var(--line)'}" stroke-width="${on?3.2:2.2}" stroke-linecap="round"/>`;
+const dot=(x,y,on)=>`<circle cx="${x}" cy="${y}" r="3.4" fill="${on?'var(--amber)':'var(--ink3)'}"/>`;
+const gtxt=(x,y,t,c)=>`<text x="${x}" y="${y}" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="${c||'var(--ink2)'}">${esc(t)}</text>`;
+function gsvg(type,x,y,w,h,colour){const g=gateBody(type,x,y,w,h);
+  return `<g style="color:${colour||'var(--violet)'}"><path d="${g.d}" fill="currentColor" opacity=".92"/>${g.ex}</g>`;}
+const gout=(type,x,w)=>gateBody(type,x,0,w,10).outX;
+
+/* ================= HERO: 4-bit ripple carry adder ================= */
+const H={a:[0,1,1,1],b:[0,0,0,1]};
+function addBits(a,b){const s=[],c=[0,0,0,0,0];let carry=0;
+  for(let i=3;i>=0;i--){const t=a[i]+b[i]+carry;s[i]=t&1;carry=t>>1;c[i]=carry;}
+  return {s,c,cout:carry};}
+const dec=a=>a.reduce((n,x)=>n*2+x,0);
+function heroDraw(){
+  const {s,c,cout}=addBits(H.a,H.b);
+  const cells=(arr,key)=>arr.map((v,i)=>`<button class="bit" data-k="${key}" data-i="${i}" aria-pressed="${!!v}">${v}</button>`).join('');
+  const ro=arr=>arr.map(v=>`<span class="bit ro" style="display:grid;place-items:center;${v?'background:var(--amber);border-color:#D89321;color:#2A1B00':''}">${v}</span>`).join('');
+  $('#hA').innerHTML=`<span style="width:40px"></span>`+cells(H.a,'a');
+  $('#hB').innerHTML=`<span style="width:40px"></span>`+cells(H.b,'b');
+  $('#hS').innerHTML=ro([cout,...s]);
+  $('#hCarry').innerHTML=[cout,c[0],c[1],c[2],0].map((v,i)=>
+    `<span class="bit carry ${v?'on':''}" style="display:grid;place-items:center;${i===4?'opacity:.35':''}">${v}</span>`).join('');
+  $('#hAd').textContent=' = '+dec(H.a);
+  $('#hBd').textContent=' = '+dec(H.b);
+  $('#hSd').textContent=' = '+(dec(s)+cout*16);
+  const chain=c.filter(Boolean).length;
+  $('#hNote').textContent=cout
+    ? `${dec(H.a)} + ${dec(H.b)} = ${dec(s)+16} \u2014 overflowed 4 bits, carry out is 1`
+    : `${dec(H.a)} + ${dec(H.b)} = ${dec(s)} \u2014 ${chain} carr${chain===1?'y':'ies'} generated`;
+}
+$('#hA').addEventListener('click',e=>{const b=e.target.closest('[data-k]');if(b){H.a[+b.dataset.i]^=1;heroDraw();}});
+$('#hB').addEventListener('click',e=>{const b=e.target.closest('[data-k]');if(b){H.b[+b.dataset.i]^=1;heroDraw();}});
+$('#hRand').addEventListener('click',()=>{H.a=H.a.map(()=>Math.random()<.5?1:0);H.b=H.b.map(()=>Math.random()<.5?1:0);heroDraw();});
+$('#hWorst').addEventListener('click',()=>{H.a=[1,1,1,1];H.b=[0,0,0,1];heroDraw();
+  $('#hNote').textContent='15 + 1 = 16 \u2014 one carry travels through all four adders. This is the slowest case.';});
+heroDraw();
+
+/* ================= SOP vs POS ================= */
+const SP=[
+ {t:'Rarely on', vars:['A','B','C'], out:[1,0,0,0,0,0,0,0],
+  story:'The output is 1 in only one situation out of eight.'},
+ {t:'Nearly always on', vars:['A','B','C'], out:[1,1,1,1,1,1,1,0],
+  story:'The output is 1 everywhere except one row. Count the terms each method produces.'},
+ {t:'Majority vote', vars:['A','B','C'], out:[0,0,0,1,0,1,1,1],
+  story:'Three judges, output is 1 when at least two vote yes. Neither method wins outright here.'}
+];
+let spI=0, spMode='sop';
+const sopTerm=(b,v)=>b.map((x,j)=>x?v[j]:v[j]+PR).join('\u00b7');
+const posTerm=(b,v)=>'('+b.map((x,j)=>x?v[j]+PR:v[j]).join(' + ')+')';
+function spDraw(){
+  const e=SP[spI], rows=rowsFor(e.vars.length);
+  $('#sopTabs').innerHTML=SP.map((x,i)=>`<button class="tab" data-i="${i}" aria-pressed="${i===spI}">${esc(x.t)}</button>`).join('')
+    +`<span style="flex:1"></span>`
+    +`<button class="tab" data-m="sop" aria-pressed="${spMode==='sop'}">Look at the 1s (SOP)</button>`
+    +`<button class="tab" data-m="pos" aria-pressed="${spMode==='pos'}">Look at the 0s (POS)</button>`;
+  $('#sopTableBox').innerHTML=ttHTML(e.vars,e.out,{mark:spMode==='sop'?'one':'zero',outName:'F'});
+  const ones=rows.filter((_,i)=>e.out[i]), zeros=rows.filter((_,i)=>!e.out[i]);
+  const sop=ones.map(b=>sopTerm(b,e.vars)).join(' + ')||'0';
+  const pos=zeros.map(b=>posTerm(b,e.vars)).join(' \u00b7 ')||'1';
+  $('#sopSteps').innerHTML=spMode==='sop'
+   ? `<ol style="margin:0;padding-left:20px;color:var(--ink2);font-size:.94rem">
+      <li>Take every row where F = <b>1</b> \u2014 ${ones.length} of them</li>
+      <li>In each row: input 1 \u2192 plain letter, input 0 \u2192 primed</li>
+      <li>Multiply the letters together (AND)</li>
+      <li>Add the terms together (OR)</li></ol>`
+   : `<ol style="margin:0;padding-left:20px;color:var(--ink2);font-size:.94rem">
+      <li>Take every row where F = <b>0</b> \u2014 ${zeros.length} of them</li>
+      <li>In each row: input 1 \u2192 <b>primed</b>, input 0 \u2192 <b>plain</b> (opposite of SOP)</li>
+      <li>Add the letters together with + (OR) inside brackets</li>
+      <li>Multiply the brackets together (AND)</li></ol>`;
+  $('#sopExpr').innerHTML='F = '+esc(spMode==='sop'?sop:pos).replace(/\u2032/g,'<span class="v">\u2032</span>');
+  $('#sopOther').textContent=(spMode==='sop'?'POS form:  F = '+pos:'SOP form:  F = '+sop);
+  const sg=ones.length?ones.length+1:0, pg=zeros.length?zeros.length+1:0;
+  $('#sopCount').innerHTML=`<b>Gate count:</b> SOP needs about ${sg} gates (${ones.length} AND + 1 OR),
+    POS needs about ${pg} (${zeros.length} OR + 1 AND). ${sg===pg?'A tie \u2014 pick whichever you find easier to read.'
+    :sg<pg?'<b>SOP wins here.</b>':'<b>POS wins here.</b>'} Both give identical outputs on all
+    ${1<<e.vars.length} rows \u2014 they are two descriptions of one circuit.`;
+}
+$('#sopTabs').addEventListener('click',ev=>{
+  const b=ev.target.closest('.tab'); if(!b)return;
+  if(b.dataset.m) spMode=b.dataset.m; else spI=+b.dataset.i;
+  spDraw();
+});
+spDraw();
+
+/* ================= ADDERS ================= */
+const tog=(id,lab,v)=>`<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+  <span class="lbl" style="min-width:5.5em">${esc(lab)}</span>
+  <button class="bit" data-t="${id}" aria-pressed="${!!v}">${v}</button></div>`;
+const lampRow=(lab,v,col)=>`<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+  <span class="lbl" style="min-width:5.5em">${esc(lab)}</span>
+  <span class="bit ro" style="display:grid;place-items:center;${v?`background:${col||'var(--mint)'};border-color:${col||'var(--mint)'};color:#fff`:''}">${v}</span></div>`;
+
+const HA={a:0,b:0};
+function haDraw(){
+  const s=HA.a^HA.b, c=HA.a&HA.b;
+  $('#haCtl').innerHTML=tog('a','Input A',HA.a)+tog('b','Input B',HA.b)
+    +`<div style="border-top:1px solid var(--line);margin:14px 0 12px"></div>`
+    +lampRow('Sum',s)+lampRow('Carry',c,'var(--red)');
+  let g='';
+  g+=wire(8,24,72,24,HA.a)+gtxt(0,28,'A')+wire(8,60,72,60,HA.b)+gtxt(0,64,'B');
+  g+=dot(40,24,HA.a)+wire(40,24,40,96,HA.a)+wire(40,96,72,96,HA.a);
+  g+=dot(56,60,HA.b)+wire(56,60,56,120,HA.b)+wire(56,120,72,120,HA.b);
+  g+=gsvg('XOR',78,18,52,48,'var(--violet)')+gsvg('AND',78,84,52,48,'var(--red)');
+  g+=wire(136,42,210,42,s)+gtxt(216,46,'Sum = A\u2295B','var(--ink)');
+  g+=wire(132,108,210,108,c)+gtxt(216,112,'Carry = A\u00b7B','var(--ink)');
+  $('#haSvg').innerHTML=`<svg viewBox="0 0 340 150">${g}</svg>`;
+  $('#haTable').innerHTML=ttHTML(['A','B'],[0,1,1,0],{outName:'Sum',extraCols:[[0,0,0,1]],outs:['A','B','Sum','Carry'],hot:HA.a*2+HA.b});
+}
+$('#haCtl').addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(b){HA[b.dataset.t]^=1;haDraw();}});
+haDraw();
+
+const FA={a:0,b:0,c:0};
+function faDraw(){
+  const p=FA.a^FA.b, s=p^FA.c, c1=FA.a&FA.b, c2=p&FA.c, co=c1|c2;
+  $('#faCtl').innerHTML=tog('a','Input A',FA.a)+tog('b','Input B',FA.b)+tog('c','Carry in',FA.c)
+    +`<div style="border-top:1px solid var(--line);margin:14px 0 12px"></div>`
+    +lampRow('Sum',s)+lampRow('Carry out',co,'var(--red)')
+    +`<p style="font-size:.84rem;color:var(--ink2);margin:6px 0 0" class="mono">A\u2295B = ${p} \u00b7 A\u00b7B = ${c1} \u00b7 (A\u2295B)\u00b7Cin = ${c2}</p>`;
+  let g='';
+  g+=wire(8,22,64,22,FA.a)+gtxt(0,26,'A')+wire(8,56,64,56,FA.b)+gtxt(0,60,'B')+wire(8,150,150,150,FA.c)+gtxt(0,154,'Cin');
+  g+=gsvg('XOR',70,14,48,44,'var(--violet)');
+  g+=dot(34,22,FA.a)+wire(34,22,34,104,FA.a)+wire(34,104,70,104,FA.a);
+  g+=dot(48,56,FA.b)+wire(48,56,48,134,FA.b)+wire(48,134,70,134,FA.b);
+  g+=gsvg('AND',70,96,48,44,'var(--red)');
+  g+=wire(124,36,150,36,p)+gtxt(126,28,'A\u2295B','var(--violet)');
+  g+=dot(150,36,p)+wire(150,36,150,60,p)+wire(150,60,176,60,p);
+  g+=dot(150,150,FA.c)+wire(150,150,150,96,FA.c)+wire(150,96,176,96,FA.c);
+  g+=gsvg('XOR',182,46,48,44,'var(--violet)');
+  g+=dot(164,60,p)+wire(164,60,164,190,p)+wire(164,190,182,190,p);
+  g+=dot(196,150,FA.c)+wire(196,150,196,220,FA.c)+wire(196,220,182,220,FA.c);
+  g+=gsvg('AND',182,182,48,44,'var(--red)');
+  g+=wire(236,68,320,68,s)+gtxt(324,72,'Sum','var(--ink)');
+  g+=wire(124,118,250,118,c1)+wire(236,204,250,204,c2);
+  g+=wire(250,118,250,140,c1)+wire(250,204,250,168,c2)+wire(250,140,262,140,c1)+wire(250,168,262,168,c2);
+  g+=gsvg('OR',262,128,48,52,'var(--amber)');
+  g+=wire(312,154,320,154,co)+gtxt(324,158,'Cout','var(--ink)');
+  $('#faSvg').innerHTML=`<svg viewBox="0 0 380 240">${g}</svg>`;
+  const rows=rowsFor(3);
+  $('#faTable').innerHTML=ttHTML(['A','B','Cin'],rows.map(([a,b,c])=>a^b^c),
+    {outs:['A','B','Cin','Sum','Cout'],extraCols:[rows.map(([a,b,c])=>((a&b)|((a^b)&c))?1:0)],hot:FA.a*4+FA.b*2+FA.c});
+}
+$('#faCtl').addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(b){FA[b.dataset.t]^=1;faDraw();}});
+faDraw();
+
+/* ================= RIPPLE CARRY ================= */
+const RC={a:[1,1,1,1],b:[0,0,0,1],step:0,timer:null};
+function rcDraw(){
+  const cells=(arr,k)=>arr.map((v,i)=>`<button class="bit" data-k="${k}" data-i="${i}" aria-pressed="${!!v}">${v}</button>`).join('');
+  $('#rcCtl').innerHTML=`<div class="bitrow" style="margin-bottom:8px"><span class="lbl">A</span>${cells(RC.a,'a')}
+      <span class="sum">= ${dec(RC.a)}</span></div>
+    <div class="bitrow"><span class="lbl">B</span>${cells(RC.b,'b')}<span class="sum">= ${dec(RC.b)}</span></div>`;
+  const {s,c,cout}=addBits(RC.a,RC.b);
+  const carryIn=[0,c[3],c[2],c[1]];            // into adder 0..3 (LSB first)
+  let h='<div style="display:flex;gap:10px;flex-wrap:wrap-reverse;justify-content:flex-end">';
+  for(let i=0;i<4;i++){                        // i = adder index, 0 = LSB
+    const bit=3-i, done=RC.step>i, active=RC.step===i;
+    h+=`<div style="flex:1 1 120px;min-width:118px;border:2px solid ${active?'var(--amber)':done?'var(--mint)':'var(--line)'};
+      border-radius:11px;padding:10px;background:${done?'rgba(17,141,119,.06)':active?'#FFF6E6':'var(--board)'};opacity:${done||active?1:.5}">
+      <div style="font-family:JetBrains Mono,monospace;font-size:.72rem;color:var(--ink2)">FA${i} \u00b7 bit ${i}</div>
+      <div class="mono" style="font-size:.84rem;margin-top:5px">A=${RC.a[bit]} B=${RC.b[bit]}</div>
+      <div class="mono" style="font-size:.84rem">Cin=${done||active?carryIn[i]:'?'}</div>
+      <div style="border-top:1px solid var(--line);margin:7px 0 5px"></div>
+      <div class="mono" style="font-size:.9rem;font-weight:700">Sum=${done?s[bit]:'?'}
+        <span style="color:var(--red)">Cout=${done?c[bit]:'?'}</span></div></div>`;
+  }
+  h+='</div>';
+  $('#rcStage').innerHTML=h;
+  const f=$('#rcFb'); f.className='feedback show '+(RC.step>=4?'good':'bad');
+  f.innerHTML=RC.step===0
+    ? `<b>Nothing has settled yet.</b> All four adders have their A and B bits already, but only FA0 knows its carry in \u2014 it is always 0. The rest must wait.`
+    : RC.step>=4
+      ? `<b>Settled after 4 steps.</b> ${dec(RC.a)} + ${dec(RC.b)} = ${dec(s)+cout*16}. Every adder had its inputs from the very start, yet the answer still took four gate delays to appear, because each carry had to be computed before the next adder could begin. A 64-bit version takes 64.`
+      : `<b>Step ${RC.step} of 4.</b> FA${RC.step-1} has finished and passed its carry of ${c[3-(RC.step-1)]} to FA${RC.step}. Now FA${RC.step} can start.`;
+}
+$('#rcCtl').addEventListener('click',e=>{const b=e.target.closest('[data-k]');
+  if(b){RC[b.dataset.k][+b.dataset.i]^=1;RC.step=0;rcDraw();}});
+$('#rcStep').addEventListener('click',()=>{if(RC.step<4){RC.step++;rcDraw();}});
+$('#rcReset').addEventListener('click',()=>{clearInterval(RC.timer);RC.step=0;rcDraw();});
+$('#rcRun').addEventListener('click',()=>{clearInterval(RC.timer);RC.step=0;rcDraw();
+  RC.timer=setInterval(()=>{RC.step++;rcDraw();if(RC.step>=4)clearInterval(RC.timer);},750);});
+rcDraw();
+
+/* ================= MULTIPLEXER ================= */
+const MX={d:[0,1,1,0],s1:0,s0:0};
+function mxDraw(){
+  const sel=MX.s1*2+MX.s0, y=MX.d[sel];
+  $('#muxCtl').innerHTML=
+    `<p class="lbl" style="margin-bottom:8px">Data inputs</p>`
+    +MX.d.map((v,i)=>`<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <span class="lbl" style="min-width:3em;${i===sel?'color:var(--amber);font-weight:700':''}">D${i}</span>
+        <button class="bit" data-d="${i}" aria-pressed="${!!v}">${v}</button>
+        ${i===sel?'<span style="font-size:.78rem;color:var(--amber);font-weight:600">\u2190 selected</span>':''}</div>`).join('')
+    +`<p class="lbl" style="margin:16px 0 8px">Select lines</p>`
+    +`<div style="display:flex;gap:16px">
+       <div style="display:flex;align-items:center;gap:8px"><span class="lbl" style="min-width:2em">S1</span>
+         <button class="bit" data-s="1" aria-pressed="${!!MX.s1}">${MX.s1}</button></div>
+       <div style="display:flex;align-items:center;gap:8px"><span class="lbl" style="min-width:2em">S0</span>
+         <button class="bit" data-s="0" aria-pressed="${!!MX.s0}">${MX.s0}</button></div></div>`
+    +`<div style="border-top:1px solid var(--line);margin:16px 0 12px"></div>`+lampRow('Output Y',y,'var(--amber)')
+    +`<p class="mono" style="font-size:.85rem;color:var(--ink2)">S1S0 = ${MX.s1}${MX.s0} \u2192 D${sel} = ${y}</p>`;
+  let g='';
+  for(let i=0;i<4;i++){
+    const on=i===sel, py=18+i*52;
+    g+=wire(8,py+16,54,py+16,MX.d[i])+gtxt(0,py+20,'D'+i,on?'var(--amber)':'var(--ink2)');
+    g+=gsvg('AND',54,py,44,34,on?'var(--amber)':'var(--line)');
+    g+=wire(98,py+17,150,py+17,on&&MX.d[i]);
+    g+=wire(150,py+17,150,110,on&&MX.d[i]);
+  }
+  g+=gsvg('OR',158,84,50,54,'var(--violet)')+wire(208,111,262,111,y)+gtxt(266,115,'Y = '+y,'var(--ink)');
+  g+=gtxt(60,232,'S1 S0 select which AND gate opens','var(--ink3)');
+  $('#muxSvg').innerHTML=`<svg viewBox="0 0 330 244">${g}</svg>`;
+  $('#muxExpr').textContent='Y = S1\u2032S0\u2032D0 + S1\u2032S0D1 + S1S0\u2032D2 + S1S0D3';
+  $('#muxTable').innerHTML=`<table class="tt"><thead><tr><th>S1</th><th>S0</th><th>Output Y</th></tr></thead><tbody>`
+    +[0,1,2,3].map(i=>`<tr class="${i===sel?'hot':''}"><td>${i>>1}</td><td>${i&1}</td><td class="out">D${i} = ${MX.d[i]}</td></tr>`).join('')
+    +`</tbody></table>`;
+}
+$('#muxCtl').addEventListener('click',e=>{
+  const d=e.target.closest('[data-d]'); if(d){MX.d[+d.dataset.d]^=1;return mxDraw();}
+  const s=e.target.closest('[data-s]'); if(s){MX[+s.dataset.s?'s1':'s0']^=1;mxDraw();}
+});
+mxDraw();
+
+/* MUX as a function generator */
+const MXF={target:[0,1,1,0],d:[0,0,0,0]};
+function mxfDraw(){
+  $('#muxFn').innerHTML=`
+    <p style="font-size:.9rem;color:var(--ink2);margin-bottom:12px">Target function:
+      <span class="mono"><b>F = A\u2295B</b></span> (exclusive OR). Wire A to S1 and B to S0,
+      then set each data input to what F should be for that row.</p>
+    <div style="display:grid;gap:8px;max-width:420px">
+      ${[0,1,2,3].map(i=>`<div style="display:flex;align-items:center;gap:12px">
+        <span class="mono" style="font-size:.85rem;min-width:8.5em">A=${i>>1} B=${i&1} \u2192 D${i}</span>
+        <button class="bit" data-f="${i}" aria-pressed="${!!MXF.d[i]}">${MXF.d[i]}</button>
+        <span class="mono" style="font-size:.8rem;color:var(--ink3)">F should be ${MXF.target[i]}</span></div>`).join('')}
+    </div>
+    <div class="btnrow"><button class="btn accent" id="mxfCheck">Check the wiring</button></div>`;
+  $('#mxfCheck').addEventListener('click',()=>{
+    const ok=MXF.d.every((v,i)=>v===MXF.target[i]);
+    const f=$('#muxFb'); f.className='feedback show '+(ok?'good':'bad');
+    f.innerHTML=ok?`<b>That is an XOR gate now.</b> You built it without designing a single gate \u2014 you just copied the
+      output column of the truth table onto the data inputs. A 4:1 MUX can be any 2-variable function; an 8:1 can be any
+      3-variable function. This is exactly how lookup tables inside an FPGA work.`
+      :`<b>Not matching yet.</b> Each data input holds the answer for one row of the truth table.
+      D0 is the row where A=0 and B=0, D1 is A=0 B=1, and so on. Copy the output column straight down.`;
+  });
+}
+$('#muxFn').addEventListener('click',e=>{const b=e.target.closest('[data-f]');if(b){MXF.d[+b.dataset.f]^=1;mxfDraw();}});
+mxfDraw();
+
+/* ================= DECODER ================= */
+const DC={a:0,b:0};
+function dcDraw(){
+  const sel=DC.a*2+DC.b, out=[0,0,0,0]; out[sel]=1;
+  $('#decCtl').innerHTML=tog('a','A (MSB)',DC.a)+tog('b','B (LSB)',DC.b)
+    +`<div style="border-top:1px solid var(--line);margin:14px 0 12px"></div>`
+    +out.map((v,i)=>lampRow('D'+i+' = A'+(i>>1?'':PR)+'\u00b7B'+(i&1?'':PR),v,'var(--violet)')).join('');
+  let g='';
+  g+=wire(8,18,250,18,DC.a)+gtxt(0,22,'A')+wire(8,40,250,40,DC.b)+gtxt(0,44,'B');
+  g+=dot(30,18,DC.a)+wire(30,18,30,62,DC.a)+gsvg('NOT',36,50,26,24,'var(--red)')+wire(72,62,250,62,!DC.a)+gtxt(66,56,'A'+PR,'var(--red)');
+  g+=dot(46,40,DC.b)+wire(46,40,46,86,DC.b)+gsvg('NOT',52,74,26,24,'var(--red)')+wire(88,86,250,86,!DC.b)+gtxt(82,80,'B'+PR,'var(--red)');
+  for(let i=0;i<4;i++){
+    const gy=110+i*44, on=out[i];
+    const src1=(i>>1)?18:62, src2=(i&1)?40:86, tx=100+i*14, tx2=108+i*14;
+    g+=dot(tx,src1,1)+wire(tx,src1,tx,gy+9,1)+wire(tx,gy+9,250,gy+9,1);
+    g+=dot(tx2,src2,1)+wire(tx2,src2,tx2,gy+25,1)+wire(tx2,gy+25,250,gy+25,1);
+    g+=gsvg('AND',250,gy,42,34,on?'var(--amber)':'var(--line)');
+    g+=wire(292,gy+17,330,gy+17,on)+gtxt(334,gy+21,'D'+i,on?'var(--ink)':'var(--ink3)');
+  }
+  $('#decSvg').innerHTML=`<svg viewBox="0 0 370 300">${g}</svg>`;
+  $('#decTable').innerHTML=`<table class="tt"><thead><tr><th>A</th><th>B</th><th>D3</th><th>D2</th><th>D1</th><th>D0</th><th>Active</th></tr></thead><tbody>`
+    +[0,1,2,3].map(i=>`<tr class="${i===sel?'hot':''}"><td>${i>>1}</td><td>${i&1}</td>
+      ${[3,2,1,0].map(j=>`<td>${j===i?1:0}</td>`).join('')}<td class="out">D${i}</td></tr>`).join('')+`</tbody></table>`;
+}
+$('#decCtl').addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(b){DC[b.dataset.t]^=1;dcDraw();}});
+dcDraw();
+
+/* ---- seven-segment ---- */
+const SEG={0:'1111110',1:'0110000',2:'1101101',3:'1111001',4:'0110011',
+           5:'1011011',6:'1011111',7:'1110000',8:'1111111',9:'1111011'};
+const SS={b:[0,0,0,0]};
+function ssDraw(){
+  const n=dec(SS.b), valid=n<=9, pat=valid?SEG[n]:'0000000';
+  $('#ssCtl').innerHTML=`<p class="lbl" style="margin-bottom:10px">BCD input (8 4 2 1)</p>
+    <div class="bitrow">${SS.b.map((v,i)=>`<button class="bit" data-i="${i}" aria-pressed="${!!v}">${v}</button>`).join('')}</div>
+    <p class="mono" style="font-size:.9rem;margin-top:12px">value = ${n} ${valid?'':'\u2014 not a decimal digit, display blanks'}</p>
+    <div class="btnrow"><button class="btn ghost" id="ssUp">Count up</button></div>`;
+  const on=i=>pat[i]==='1'?'var(--red)':'#E6E9ED';
+  $('#ssDisplay').innerHTML=`<svg viewBox="0 0 90 150" style="width:110px">
+    <polygon points="18,10 72,10 64,20 26,20" fill="${on(0)}"/>
+    <polygon points="74,12 80,22 80,64 70,70 68,26" fill="${on(1)}"/>
+    <polygon points="70,80 80,86 80,128 74,138 68,124" fill="${on(2)}"/>
+    <polygon points="26,130 64,130 72,140 18,140" fill="${on(3)}"/>
+    <polygon points="20,80 22,124 16,138 10,128 10,86" fill="${on(4)}"/>
+    <polygon points="20,26 22,70 12,64 10,22 16,12" fill="${on(5)}"/>
+    <polygon points="26,70 64,70 72,75 64,80 26,80 18,75" fill="${on(6)}"/></svg>`;
+  $('#ssSegs').innerHTML=`<div class="chiprow">${'abcdefg'.split('').map((s,i)=>
+    `<span class="chip ${pat[i]==='1'?'ok':''}">segment ${s} = ${pat[i]}</span>`).join('')}</div>
+    <p style="font-size:.88rem;color:var(--ink2);margin-top:12px">Look at the top bar on its own. It is lit for
+    ${[0,2,3,5,6,7,8,9].join(', ')} and dark for 1 and 4. Write that out as a column of eight 1s and two 0s and you have
+    a truth table \u2014 and you already know how to turn one of those into gates.</p>`;
+  $('#ssUp').addEventListener('click',()=>{const v=(n+1)%10;SS.b=[3,2,1,0].map(i=>(v>>i)&1);ssDraw();});
+}
+$('#ssCtl').addEventListener('click',e=>{const b=e.target.closest('[data-i]');if(b){SS.b[+b.dataset.i]^=1;ssDraw();}});
+ssDraw();
+
+/* ================= ENCODERS ================= */
+const EN={i:[0,0,0,0]};
+function enDraw(){
+  $('#encCtl').innerHTML=`<p class="lbl" style="margin-bottom:10px">Press any inputs \u2014 try two at once</p>
+    <div class="bitrow">${EN.i.map((v,k)=>`<button class="bit" data-i="${k}" aria-pressed="${!!v}"
+      style="width:auto;padding:0 14px">I${k}</button>`).join('')}
+      <button class="btn ghost" id="enClear" style="margin-left:8px">Clear</button></div>`;
+  const [i0,i1,i2,i3]=EN.i;
+  const p1=i2|i3, p0=i1|i3;                         // plain encoder (OR based)
+  const hi=i3?3:i2?2:i1?1:i0?0:-1;                  // priority encoder
+  const q1=hi<0?0:hi>>1, q0=hi<0?0:hi&1, valid=hi>=0;
+  const count=EN.i.filter(Boolean).length;
+  const box=(a,b,txt,col)=>`<div class="mono" style="font-size:1.4rem;font-weight:700;color:${col}">${a}${b}
+    <span style="font-size:.8rem;font-weight:400;color:var(--ink2)"> = decimal ${a*2+b}</span></div>
+    <p style="font-size:.88rem;color:var(--ink2);margin-top:8px">${txt}</p>`;
+  $('#encPlain').innerHTML=`<div class="panel" style="box-shadow:none;margin:0">
+    <p class="mono" style="font-size:.8rem;color:var(--ink3);margin-bottom:8px">O1 = I2 + I3 \u00b7 O0 = I1 + I3</p>
+    ${box(p1,p0, count>1?'Two inputs are active, so the codes have been ORed together. The answer names an input nobody pressed.'
+      :count===0?'Nothing is pressed, yet the output reads 00 \u2014 which also means "input 0".':'Correct, because only one input is active.',
+      count>1||count===0?'var(--red)':'var(--ink)')}</div>`;
+  $('#encPri').innerHTML=`<div class="panel" style="box-shadow:none;margin:0">
+    <p class="mono" style="font-size:.8rem;color:var(--ink3);margin-bottom:8px">highest active input wins \u00b7 V = valid</p>
+    ${box(q1,q0, valid?`I${hi} has priority${count>1?', so the lower inputs are ignored':''}. Valid = 1.`
+      :'Nothing pressed, so Valid = 0 and the code should be disregarded.','var(--ink)')}
+    <span class="chip ${valid?'ok':'no'}" style="margin-top:6px">Valid = ${valid?1:0}</span></div>`;
+  const f=$('#encFb');
+  if(count>1){f.className='feedback show bad';
+    f.innerHTML=`<b>The plain encoder just reported input ${p1*2+p0}.</b> You pressed ${EN.i.map((v,k)=>v?'I'+k:null).filter(Boolean).join(' and ')}.
+      It did not choose between them \u2014 it added their codes together bit by bit and produced a number that means something else entirely.
+      This is why every real keyboard, interrupt controller and quiz buzzer uses a priority encoder.`;}
+  else {f.className='feedback';}
+}
+$('#encCtl').addEventListener('click',e=>{
+  if(e.target.id==='enClear'){EN.i=[0,0,0,0];return enDraw();}
+  const b=e.target.closest('[data-i]'); if(b){EN.i[+b.dataset.i]^=1;enDraw();}
+});
+enDraw();
+
+/* ================= UNIT TEST ================= */
+const PARTS={A:'Guest list or ban list',B:'Adding',C:'Choosing',D:'Decoding'};
+const Q=[
+{p:'A',q:'You are writing a guest list. Which rows of the truth table do you use?',opts:['Rows where the output is 0','Rows where the output is 1','Every row','Only the first and last rows'],a:1,
+ why:'SOP builds a detector for each situation that switches the output on, so only the 1-rows matter. The 0-rows are discarded entirely.'},
+{p:'A',q:'You are writing a ban list instead. Which rows do you use now?',opts:['Rows where the output is 1','Rows where the output is 0','Rows where inputs are all 1','Alternate rows'],a:1,
+ why:'POS is the mirror image: instead of listing every way to switch on, you list every way to switch off and forbid all of them.'},
+{p:'A',q:'In a POS term, an input value of 1 is written as:',opts:['The plain letter','The primed letter','Omitted','Doubled'],a:1,
+ why:'This is the reversal that catches people. In SOP, 1 means plain. In POS, 1 means primed and 0 means plain — the opposite in every respect.'},
+{p:'A',q:'In a sum-of-products expression, the individual terms are joined by:',opts:['AND','OR','XOR','NOT'],a:1,
+ why:'Letters inside a term are ANDed (the product); the terms themselves are ORed (the sum). The name says it: sum OF products.'},
+{p:'A',q:'In a product-of-sums expression, the bracketed terms are joined by:',opts:['OR','AND','XOR','NAND'],a:1,
+ why:'Inside each bracket the letters are ORed; the brackets are ANDed together. Product OF sums — again, the name is the rule.'},
+{p:'A',q:'Six rows output 1 and two output 0. Which list is shorter to write?',opts:['SOP, with 6 terms','POS, with 2 terms','Both give 4','Neither can be used'],a:1,
+ why:'One term per row used, so SOP gives 6 and POS gives 2. Count the 1s and the 0s before you start — it can save you two-thirds of the work.'},
+{p:'A',q:"The expression A\u2032\u00b7B\u2032 + A\u00b7B is equivalent to which single gate?",opts:['XOR','XNOR','NAND','OR'],a:1,
+ why:'It outputs 1 when both inputs are 0 or both are 1 — that is, when the inputs agree. Agreement is XNOR.'},
+{p:'B',q:'Which gate produces the SUM output of a half adder?',opts:['AND','OR','XOR','NOR'],a:2,
+ why:'The sum bit is 1 when exactly one input is 1 — the definition of XOR. In binary 1 + 1 = 10, so the sum column reads 0 and the carry takes the 1.'},
+{p:'B',q:'Which gate produces the CARRY output of a half adder?',opts:['AND','OR','XOR','NAND'],a:0,
+ why:'A carry is generated only when both bits are 1, which is exactly what AND detects.'},
+{p:'B',q:'How many inputs does a full adder have?',opts:['Two','Three','Four','One'],a:1,
+ why:'A, B and the carry in from the column to the right. That third input is the only difference from a half adder.'},
+{p:'B',q:'A full adder can be built from:',opts:['Two half adders and an OR gate','Two half adders and an AND gate','Three half adders','One half adder and a NOT gate'],a:0,
+ why:'The first half adder adds A and B; the second adds that result to the carry in. A carry out occurs if either half adder generated one, hence the OR.'},
+{p:'B',q:'A full adder receives A = 1, B = 1, Cin = 1. What are Sum and Cout?',opts:['Sum 0, Cout 0','Sum 1, Cout 1','Sum 0, Cout 1','Sum 1, Cout 0'],a:1,
+ why:'1 + 1 + 1 = 3, which in binary is 11. So the sum bit is 1 and the carry out is 1.'},
+{p:'B',q:'A 4-bit ripple-carry adder is built from:',opts:['Four half adders','Four full adders (or three full adders and one half adder)','Two full adders','One full adder used four times'],a:1,
+ why:'One adder per bit position. The least significant bit has no incoming carry so a half adder suffices there, but using four full adders and tying the first carry in to 0 is simpler to build.'},
+{p:'B',q:'What is the problem with the bucket-brigade way of adding?',opts:['It uses too many gates','Each stage must wait for the carry from the stage before it','It cannot handle zero','It is not accurate'],a:1,
+ why:'Every adder has its A and B bits from the start, but cannot finish until its carry arrives. The delay grows in proportion to the number of bits.'},
+{p:'B',q:'Which design solves the ripple-carry delay problem?',opts:['Carry-lookahead adder','Half adder','Multiplexer','Priority encoder'],a:0,
+ why:'A carry-lookahead adder computes every carry directly from the inputs in parallel rather than waiting for them in sequence. It costs considerably more gates — the usual speed-for-hardware trade.'},
+{p:'C',q:'How many select lines does an 8:1 multiplexer need?',opts:['2','3','4','8'],a:1,
+ why:'2\u207f inputs need n select lines, and 8 = 2\u00b3. Three select lines give eight distinct combinations, one per input.'},
+{p:'C',q:'A switch box has 16 things plugged into it. How many select wires does it need?',opts:['2','3','4','16'],a:2,
+ why:'16 = 2\u2074, so four select lines. Learn the relationship rather than the individual cases and any version of this question is instant.'},
+{p:'C',q:'What does a multiplexer do?',opts:['Routes one of several inputs to a single output','Routes one input to several outputs','Adds two binary numbers','Converts binary to decimal'],a:0,
+ why:'Many in, one out, with select lines deciding which. It is a switch built from gates rather than moving parts.'},
+{p:'C',q:'A demultiplexer does the opposite of a multiplexer. It:',opts:['Adds numbers','Routes one input to one of several outputs','Inverts every signal','Stores data'],a:1,
+ why:'One in, many out. A MUX gathers, a DEMUX distributes — the pair is how one wire can serve many destinations in turn.'},
+{p:'C',q:'In a 4:1 multiplexer, select lines S1 S0 = 10. Which data input reaches the output?',opts:['D0','D1','D2','D3'],a:2,
+ why:'Binary 10 is decimal 2, so D2 is selected. Read the select lines as a binary number and it names the input directly.'},
+{p:'C',q:'A 4:1 multiplexer can implement any Boolean function of how many variables?',opts:['One','Two','Three','Four'],a:1,
+ why:'Wire the two variables to the select lines and put the truth table\u2019s output column on the four data inputs. No gate design needed — this is how lookup tables inside FPGAs work.'},
+{p:'D',q:'How many outputs does a 3-to-8 decoder have?',opts:['3','6','8','16'],a:2,
+ why:'n inputs give 2\u207f outputs, and 2\u00b3 = 8. Exactly one of those eight is active for any given input code.'},
+{p:'D',q:'How many AND gates does a 2-to-4 decoder need?',opts:['2','3','4','8'],a:2,
+ why:'One AND gate per output, each wired to fire for one specific input combination. It also needs two inverters to produce the primed signals.'},
+{p:'D',q:'In a 2-to-4 decoder with inputs A and B, output D2 is produced by:',opts:['A\u00b7B','A\u00b7B\u2032','A\u2032\u00b7B','A\u2032\u00b7B\u2032'],a:1,
+ why:'D2 fires for the code 10, meaning A = 1 and B = 0. Write the code as a minterm: A plain, B primed.'},
+{p:'D',q:'An encoder with 8 input lines has how many outputs?',opts:['2','3','4','8'],a:1,
+ why:'2\u207f inputs compress to n outputs, so 8 inputs give 3. An encoder is a decoder run backwards.'},
+{p:'D',q:'Two players slam their buzzers at the same time. What does a plain encoder do?',opts:['Nothing, it handles both','It outputs a code that matches neither input','It outputs zero','It shuts down'],a:1,
+ why:'The OR gates combine the two codes bit by bit, producing a third code entirely. Press I1 and I2 together on a 4-to-2 encoder and it reports 3 — an input nobody touched.'},
+{p:'D',q:'Why does a priority encoder need an extra wire called "valid"?',opts:['To report errors','To distinguish "input 0 is active" from "nothing is active"','To double the speed','To select the output format'],a:1,
+ why:'Both situations would otherwise produce the code 00. The valid line resolves the ambiguity, and it is one of the two standard limitations of a basic encoder that exams ask for.'},
+{p:'B',q:'Each full adder in a 4-bit ripple-carry adder takes 2 gate delays to produce its carry out. Worst case, how long before the whole answer is stable?',opts:['2 gate delays','4 gate delays','8 gate delays','16 gate delays'],a:2,
+ why:'The carry must pass through all four adders one after the other, and each costs 2 delays. 4 × 2 = 8 gate delays. This is why the delay grows in step with the width of the numbers, and why carry-lookahead had to be invented.'},
+{p:'B',q:'In a full adder, Cout = A·B + Cin·(A⊕B). With A = 1, B = 0 and Cin = 1, what is Cout?',opts:['0','1','Undefined','It depends on the previous result'],a:1,
+ why:'A·B = 0. A⊕B = 1, so Cin·(A⊕B) = 1. Then 0 + 1 = 1. Check it against the arithmetic: 1 + 0 + 1 = 2, which is binary 10, so sum 0 and carry 1. The algebra and the counting agree, as they must.'},
+{p:'B',q:'A 4-bit adder computes 15 + 1. The sum outputs read 0000 and the carry out reads 1. What has occurred?',opts:['A hardware fault','Arithmetic overflow — the true result needs a fifth bit','The adder has reset itself','Nothing unusual; 15 + 1 is 0'],a:1,
+ why:'Four bits represent only 0 to 15, so 16 does not fit. The carry out is the adder reporting that the true answer exceeded its width. In a real processor that line sets a flag the program can test, which is how overflow gets caught rather than silently corrupting a result.'},
+];
+let T={order:[],i:0,answers:{}};
+const grade=p=>p>=85?'A':p>=75?'B':p>=65?'C':p>=50?'D':'F';
+function testStart(list){
+  T={order:list||Q.map((_,i)=>i),i:0,answers:{}};
+  $('#testIntro').classList.add('hide');$('#testDone').classList.add('hide');$('#reviewBox').innerHTML='';
+  $('#testRun').classList.remove('hide');testRender();
+}
+function testRender(){
+  const q=Q[T.order[T.i]];
+  $('#testPos').textContent=`${T.i+1} / ${T.order.length}`;
+  $('#testMeter').style.width=(T.i/T.order.length*100)+'%';
+  $('#testScore').textContent=`${Object.entries(T.answers).filter(([k,v])=>v===Q[k].a).length} correct`;
+  $('#qcard').innerHTML=`<span class="mono" style="font-size:.78rem;color:var(--ink3)">Question ${T.i+1}</span>
+    <span style="font-size:.72rem;background:rgba(90,75,156,.1);color:var(--violet);border-radius:5px;padding:2px 8px;margin-left:8px">Part ${q.p} \u00b7 ${PARTS[q.p]}</span>
+    <p style="font-size:1.12rem;font-family:'Space Grotesk',sans-serif;margin:10px 0 6px;line-height:1.35">${esc(q.q)}</p>
+    <div style="display:grid;gap:9px;margin-top:16px">${q.opts.map((o,i)=>
+      `<button class="opt" data-i="${i}" style="text-align:left;border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:12px 15px;cursor:pointer;display:flex;gap:11px;font-size:.97rem">
+       <span class="mono" style="font-weight:700;color:var(--ink3)">${'ABCD'[i]}</span><span>${esc(o)}</span></button>`).join('')}</div>
+    <div class="feedback" id="qfb"></div>`;
+}
+$('#qcard').addEventListener('click',e=>{
+  const b=e.target.closest('.opt'); if(!b||b.disabled)return;
+  const idx=T.order[T.i],q=Q[idx],pick=+b.dataset.i;
+  T.answers[idx]=pick;
+  $$('#qcard .opt').forEach((o,i)=>{o.disabled=true;
+    if(i===q.a){o.style.background='rgba(17,141,119,.12)';o.style.borderColor='var(--mint)';}
+    else if(i===pick){o.style.background='rgba(224,75,47,.1)';o.style.borderColor='var(--red)';}});
+  const f=$('#qfb'),last=T.i===T.order.length-1;
+  f.className='feedback show '+(pick===q.a?'good':'bad');
+  f.innerHTML=`<b>${pick===q.a?'Correct.':'The answer is '+'ABCD'[q.a]+'.'}</b> ${esc(q.why)}
+    <div class="btnrow"><button class="btn accent" id="qNext">${last?'See my results':'Next question'}</button></div>`;
+  $('#qNext').addEventListener('click',()=>{if(last)return testFinish();T.i++;testRender();$('#qcard').scrollIntoView({block:'nearest'});});
+});
+function testFinish(){
+  $('#testRun').classList.add('hide');$('#testDone').classList.remove('hide');
+  const asked=T.order.length,right=T.order.filter(i=>T.answers[i]===Q[i].a).length,pct=Math.round(right/asked*100);
+  $('#doneScore').textContent=`${right}/${asked}`;
+  $('#doneGrade').textContent=`${pct}%  \u00b7  grade ${grade(pct)}`;
+  $('#doneMsg').textContent=pct>=85?'You properly get this. You could explain how a computer adds to someone who has never seen a logic gate \u2014 which is more than most adults can do.'
+    :pct>=65?'Solid, with a couple of gaps. Look at your weakest part below, go play with that section again, then come back.'
+    :'Do not stress about this score. Go back up the page and actually click things \u2014 flip the adder bits, step the buckets, press two buzzers at once. This stuff makes way more sense once you have poked it.';
+  $('#doneBreak').innerHTML=Object.keys(PARTS).map(p=>{
+    const ids=T.order.filter(i=>Q[i].p===p); if(!ids.length)return '';
+    const ok=ids.filter(i=>T.answers[i]===Q[i].a).length;
+    return `<div style="display:flex;align-items:center;gap:12px;font-size:.92rem">
+      <span style="flex:1 1 auto"><b>Part ${p}</b> \u00b7 ${PARTS[p]}</span>
+      <span style="width:110px;height:8px;background:var(--lowbg);border-radius:999px;overflow:hidden">
+        <i style="display:block;height:100%;background:var(--mint);width:${ok/ids.length*100}%"></i></span>
+      <span class="mono" style="font-size:.84rem;color:var(--ink2);min-width:3.6em;text-align:right">${ok}/${ids.length}</span></div>`;
+  }).join('');
+  const missed=T.order.filter(i=>T.answers[i]!==Q[i].a);
+  $('#retryWrong').classList.toggle('hide',!missed.length);
+  $('#retryWrong').onclick=()=>testStart(missed);
+  $('#testDone').scrollIntoView({block:'start'});
+}
+$('#testStart').addEventListener('click',()=>testStart());
+$('#testQuit').addEventListener('click',testFinish);
+$('#retryAll').addEventListener('click',()=>testStart());
+$('#reviewAll').addEventListener('click',()=>{
+  $('#reviewBox').innerHTML=`<h3 style="margin:30px 0 14px">Every question, with the reasoning</h3>`+
+    Q.map((q,i)=>`<div class="panel"><span class="mono" style="font-size:.78rem;color:var(--ink3)">Q${i+1}</span>
+      <span style="font-size:.72rem;background:rgba(90,75,156,.1);color:var(--violet);border-radius:5px;padding:2px 8px;margin-left:8px">Part ${q.p}</span>
+      <p style="font-family:'Space Grotesk',sans-serif;font-size:1rem;margin:8px 0 0">${esc(q.q)}</p>
+      <p style="margin:6px 0 0"><b>${'ABCD'[q.a]}.</b> ${esc(q.opts[q.a])}</p>
+      <p style="margin:6px 0 0;color:var(--ink2);font-size:.94rem">${esc(q.why)}</p></div>`).join('');
+  $('#reviewBox').scrollIntoView({block:'start'});
+});
+</script>
+</body>
+</html>
