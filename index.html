@@ -11,13 +11,13 @@
 <meta property="og:site_name" content="CS Unit 1 · CFBC">
 <meta name="description" content="Half and full adders, ripple carry, multiplexers, decoders, seven-segment displays and priority encoders — built up from things you already use every day.">
 <meta name="theme-color" content="#5A4B9C">
-<meta name="lesson:duration"   content="75 min">
+<meta name="lesson:duration"   content="95 min">
 <meta name="lesson:difficulty" content="Core">
 <meta name="lesson:objectives" content="8">
 <meta name="lesson:questions"  content="30">
-<meta name="lesson:sections"   content="8">
+<meta name="lesson:sections"   content="9">
 <meta name="lesson:topics"     content="Half adder,Full adder,Ripple carry,Multiplexer,Decoder,Encoder,Seven-segment,Binary addition">
-<meta name="lesson:activities" content="Adder bench,Guest list or ban list,Adder lab,Domino carry,HDMI switch,Microwave clock,Buzzer test,Unit test">
+<meta name="lesson:activities" content="Adder bench,Guest list or ban list,Adder lab,Logic.ly lab,Domino carry,HDMI switch,Microwave clock,Buzzer test,Unit test">
 <meta name="lesson:updated"    content="2026-09-15">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -130,6 +130,7 @@ footer{margin-top:60px;border-top:1px solid var(--line);padding:26px 0 56px;colo
   <a class="home" href="https://enoete.github.io/compsciu1_hub/">← Unit 1 hub</a>
   <a href="#sop">SOP vs POS</a>
   <a href="#adders">Adders</a>
+  <a href="#lab">Logic.ly lab</a>
   <a href="#ripple">Ripple carry</a>
   <a href="#mux">Multiplexers</a>
   <a href="#decoder">Decoders</a>
@@ -243,6 +244,83 @@ footer{margin-top:60px;border-top:1px solid var(--line);padding:26px 0 56px;colo
     And if <em>either</em> of them produced a carry, a carry goes out — so you OR their two carries together. That is it.
     Say it out loud once: two half adders and an OR gate. It is the kind of sentence that earns marks on its own.</div>
   </div>
+</div></section>
+
+<section id="lab"><div class="wrap">
+  <h2>Build it for real, in Logic.ly</h2>
+  <p class="sub">The adders above already know the right answer and are quietly checking your work as you drag
+  the bits. Logic.ly does not know anything — it just simulates real gates. If a wire is in the wrong place,
+  nothing warns you; the lamp simply lights up wrong, and working out why is exactly the skill this lab is for.</p>
+
+  <div class="analogy">
+    <h4>A recipe you have never actually cooked</h4>
+    <p>You can read a recipe for cook-up rice from front to back and still burn the first pot, because reading
+    "add the rice once the peas are tender" is not the same as knowing what tender peas look like in your own pot.
+    Half adders and full adders are the same. You have watched the sums and carries update on this page. Now go
+    place the gates yourself, in a tool that has no idea what answer you are aiming for.</p>
+  </div>
+
+  <div class="panel" style="border-left:4px solid var(--red)">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:4px">
+      <h3 style="margin:0">Lab 1 — the half adder</h3>
+      <a class="btn accent" href="https://logic.ly/" target="_blank" rel="noopener">Open Logic.ly ↗</a>
+    </div>
+    <ol style="margin:14px 0 18px;padding-left:20px;color:var(--ink2);font-size:.96rem">
+      <li>Drag out two <b>input switches</b>. Rename them <span class="mono">A</span> and <span class="mono">B</span>.</li>
+      <li>Drag out one <b>XOR</b> gate. Feed it A and B. Wire an <b>output light</b> to it — this is your Sum.</li>
+      <li>Drag out one <b>AND</b> gate. Feed it the same A and B. Wire a second output light to it — this is
+      your Carry.</li>
+      <li>Flip A and B through all four combinations and fill in what you actually see below.</li>
+    </ol>
+    <div class="two">
+      <div id="labTable1"></div>
+      <div>
+        <p style="font-size:.9rem;color:var(--ink2);margin-bottom:10px">Click a cell to cycle 0 → 1 → blank.</p>
+        <div class="btnrow" style="margin-top:0">
+          <button class="btn accent" id="lab1Check">Check my build</button>
+          <button class="btn ghost" id="lab1Clear">Clear</button>
+        </div>
+        <div class="feedback" id="lab1Fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" style="border-left:4px solid var(--red)">
+    <h3 style="margin-bottom:10px">Lab 2 — two half adders holding hands</h3>
+    <p style="font-size:.95rem;color:var(--ink2);margin:10px 0 16px">Stay in the same file. Do not delete anything
+    — you are about to reuse both gate pairs you just built.</p>
+    <ol style="margin:0 0 18px;padding-left:20px;color:var(--ink2);font-size:.96rem">
+      <li>Copy your whole half adder (XOR + AND) and paste a second copy next to it. You now have two.</li>
+      <li>Add a third input switch, <span class="mono">Cin</span>.</li>
+      <li>On <b>half adder 1</b>: feed it A and B, same as before. Its Sum output becomes an input to half
+      adder 2. Set its Carry output aside for a moment — you need it in step 5.</li>
+      <li>On <b>half adder 2</b>: feed it half adder 1's Sum, and Cin. Its Sum output is the final
+      <span class="mono">Sum</span> for the whole full adder. Wire a light to it.</li>
+      <li>Drag out one <b>OR</b> gate. Feed it half adder 1's Carry and half adder 2's Carry. Wire a light to
+      its output — this is <span class="mono">Cout</span>.</li>
+      <li>Flip A, B and Cin through all eight combinations and record Sum and Cout below.</li>
+    </ol>
+    <div class="two">
+      <div id="labTable2"></div>
+      <div>
+        <p style="font-size:.9rem;color:var(--ink2);margin-bottom:10px">Same idea — click to cycle 0 → 1 → blank.</p>
+        <div class="btnrow" style="margin-top:0">
+          <button class="btn accent" id="lab2Check">Check my build</button>
+          <button class="btn ghost" id="lab2Clear">Clear</button>
+        </div>
+        <div class="feedback" id="lab2Fb"></div>
+      </div>
+    </div>
+    <div class="note win" style="margin-bottom:0"><b>If both tables came back clean, read back what you built.</b>
+    Six gates total — two XOR, two AND, one OR — and no new idea anywhere in it. Every adder in every calculator,
+    every phone, every till in every shop on the island is this exact pattern, copied and wired end to end. You
+    did not simplify the problem to build it. You just followed what was already true.</div>
+  </div>
+
+  <div class="note warn"><b>When a row is wrong, do not guess — trace it.</b> Pick the one wrong row. Work out on
+  paper what each half adder's Sum and Carry should be for those exact A, B, Cin values. Then click through your
+  Logic.ly wires one at a time and find the first place a real value disagrees with your paper answer. That is
+  your bug, and now you know exactly which wire it is on.</div>
 </div></section>
 
 <section id="ripple"><div class="wrap">
@@ -934,6 +1012,86 @@ $('#reviewAll').addEventListener('click',()=>{
       <p style="margin:6px 0 0;color:var(--ink2);font-size:.94rem">${esc(q.why)}</p></div>`).join('');
   $('#reviewBox').scrollIntoView({block:'start'});
 });
+
+/* =================================================================
+   LOGIC.LY LAB — self-check tables (own small renderer: the shared
+   ttHTML above has no editable-cell mode, and every other call site
+   uses it read-only, so a dedicated one here is safer than bolting
+   editability onto a function six sections rely on).
+   ================================================================= */
+function labTT(vars, outNames, ans) {
+  const rows = rowsFor(vars.length);
+  const head = vars.map(v => `<th>${esc(v)}</th>`).join('') + outNames.map(n => `<th>${esc(n)}</th>`).join('');
+  const body = rows.map((b, i) => {
+    const ins = b.map(x => `<td>${x}</td>`).join('');
+    const outs = outNames.map((_, c) => {
+      const v = ans[i][c];
+      return `<td class="out" data-row="${i}" data-col="${c}" style="cursor:pointer">${v === null ? '·' : v}</td>`;
+    }).join('');
+    return `<tr>${ins}${outs}</tr>`;
+  }).join('');
+  return `<table class="tt"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+}
+function labCellClick(e, ansRef) {
+  const td = e.target.closest('td.out'); if (!td) return;
+  const r = +td.dataset.row, c = +td.dataset.col;
+  ansRef[r][c] = ansRef[r][c] === null ? 0 : (ansRef[r][c] === 0 ? 1 : null);
+  td.textContent = ansRef[r][c] === null ? '·' : ansRef[r][c];
+}
+
+let lab1Ans = rowsFor(2).map(() => [null, null]);
+function lab1Render() { $('#labTable1').innerHTML = labTT(['A', 'B'], ['Sum', 'Carry'], lab1Ans); }
+$('#labTable1').addEventListener('click', e => labCellClick(e, lab1Ans));
+$('#lab1Clear').addEventListener('click', () => {
+  lab1Ans = rowsFor(2).map(() => [null, null]); lab1Render(); $('#lab1Fb').className = 'feedback';
+});
+$('#lab1Check').addEventListener('click', () => {
+  const target = rowsFor(2).map(([a, b]) => [a ^ b, a & b]);
+  const fb = $('#lab1Fb');
+  if (lab1Ans.some(r => r.includes(null))) {
+    fb.className = 'feedback show bad';
+    fb.innerHTML = `<b>Some cells are still blank.</b> Read both lights in Logic.ly for that row and fill both in.`;
+    return;
+  }
+  const bad = lab1Ans.some((r, i) => r[0] !== target[i][0] || r[1] !== target[i][1]);
+  if (!bad) {
+    fb.className = 'feedback show good';
+    fb.innerHTML = `<b>All 4 rows match.</b> That is a correct half adder — Sum on the XOR, Carry on the AND.`;
+  } else {
+    fb.className = 'feedback show bad';
+    fb.innerHTML = `<b>At least one row disagrees with a real half adder.</b> Sum should only be 1 when exactly
+      one of A, B is 1. Carry should only be 1 when both are. Check which gate feeds which light — it's easy
+      to wire the AND to the Sum light and the XOR to the Carry light by mistake.`;
+  }
+});
+lab1Render();
+
+let lab2Ans = rowsFor(3).map(() => [null, null]);
+function lab2Render() { $('#labTable2').innerHTML = labTT(['A', 'B', 'Cin'], ['Sum', 'Cout'], lab2Ans); }
+$('#labTable2').addEventListener('click', e => labCellClick(e, lab2Ans));
+$('#lab2Clear').addEventListener('click', () => {
+  lab2Ans = rowsFor(3).map(() => [null, null]); lab2Render(); $('#lab2Fb').className = 'feedback';
+});
+$('#lab2Check').addEventListener('click', () => {
+  const target = rowsFor(3).map(([a, b, c]) => [a ^ b ^ c, (a & b) | ((a ^ b) & c)]);
+  const fb = $('#lab2Fb');
+  if (lab2Ans.some(r => r.includes(null))) {
+    fb.className = 'feedback show bad';
+    fb.innerHTML = `<b>Some cells are still blank.</b> Read both lights for that row of A, B, Cin and fill both in.`;
+    return;
+  }
+  const bad = lab2Ans.some((r, i) => r[0] !== target[i][0] || r[1] !== target[i][1]);
+  if (!bad) {
+    fb.className = 'feedback show good';
+    fb.innerHTML = `<b>All 8 rows match.</b> That is a genuine full adder, built from parts you already trust.`;
+  } else {
+    fb.className = 'feedback show bad';
+    fb.innerHTML = `<b>At least one row is off.</b> The classic mistake is feeding half adder 2 the wrong carry
+      — Cout comes from ORing <em>both</em> half adders' carries, and half adder 2 only ever sees half
+      adder 1's Sum, never its Carry directly. Trace one wrong row by hand and compare it wire by wire.`;
+  }
+});
+lab2Render();
 </script>
 </body>
 </html>
