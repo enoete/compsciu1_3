@@ -11,14 +11,14 @@
 <meta property="og:site_name" content="CS Unit 1 · CFBC">
 <meta name="description" content="Half and full adders, ripple carry, multiplexers, decoders, seven-segment displays and priority encoders — built up from things you already use every day.">
 <meta name="theme-color" content="#5A4B9C">
-<meta name="lesson:duration"   content="95 min">
+<meta name="lesson:duration"   content="100 min">
 <meta name="lesson:difficulty" content="Core">
 <meta name="lesson:objectives" content="8">
-<meta name="lesson:questions"  content="30">
+<meta name="lesson:questions"  content="36">
 <meta name="lesson:sections"   content="9">
 <meta name="lesson:topics"     content="Half adder,Full adder,Ripple carry,Multiplexer,Decoder,Encoder,Seven-segment,Binary addition">
 <meta name="lesson:activities" content="Adder bench,Guest list or ban list,Adder lab,Logic.ly lab,Domino carry,HDMI switch,Microwave clock,Buzzer test,Unit test">
-<meta name="lesson:updated"    content="2026-09-15">
+<meta name="lesson:updated"    content="2026-09-16">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -394,7 +394,9 @@ footer{margin-top:60px;border-top:1px solid var(--line);padding:26px 0 56px;colo
 <section id="decoder"><div class="wrap">
   <h2>One code in, one thing happens</h2>
   <p class="sub">A decoder is the opposite of a MUX. A short code goes in, and exactly one output line switches on —
-  never two, never none. It is what turns "button E4" into "drop <em>that</em> packet of chips and nothing else".</p>
+  never two, never none. It is what turns "button E4" into "drop <em>that</em> packet of chips and nothing else".
+  The maths flips too: <span class="mono">n</span> inputs give <span class="mono">2ⁿ</span> outputs — the reverse of
+  a multiplexer's rule, because a decoder is spreading a short code out wide instead of choosing one thing from many.</p>
 
   <div class="analogy">
     <h4>The vending machine at school</h4>
@@ -433,7 +435,9 @@ footer{margin-top:60px;border-top:1px solid var(--line);padding:26px 0 56px;colo
 <section id="encoder"><div class="wrap">
   <h2>The buzzer that lies to you</h2>
   <p class="sub">An encoder runs a decoder backwards: lots of buttons in, a short code out. Straightforward enough —
-  right up until two people press at the same time, at which point it does something genuinely stupid.</p>
+  right up until two people press at the same time, at which point it does something genuinely stupid. The maths
+  is the decoder's rule with the sides swapped: <span class="mono">2ⁿ</span> inputs compress down to
+  <span class="mono">n</span> outputs.</p>
 
   <div class="analogy">
     <h4>Four people on a quiz show and one scoreboard</h4>
@@ -459,11 +463,22 @@ footer{margin-top:60px;border-top:1px solid var(--line);padding:26px 0 56px;colo
   The board cannot tell the difference between "Player 0 buzzed" and "the room is empty". Real encoders bolt on an extra
   wire called <b>valid</b> that just says yes-somebody-pressed-something. Those two bugs are the standard exam answer
   for "give two limitations of a basic encoder", so they are worth the thirty seconds.</div>
+
+  <div class="panel" style="border-left:4px solid var(--violet)">
+    <h3 style="margin-bottom:4px">The same maths, three times over</h3>
+    <p style="font-size:.94rem;color:var(--ink2);margin-bottom:16px">Every "how many outputs does it have" question on this page is really the same calculation wearing three different jobs.
+    <span class="mono">2ⁿ</span> and <span class="mono">n</span> are always the pair — the only thing that changes between a MUX, a decoder and an encoder is <em>which side is the input and which is the output</em>. Pick a value of n and watch all three at once.</p>
+
+    <div class="tabs" id="ioTabs"></div>
+    <div id="ioTable"></div>
+
+    <div class="note win" style="margin:16px 0 0"><b>One sentence, all three components.</b> A decoder <em>spreads</em> a short code out wide — n inputs, 2ⁿ outputs. An encoder <em>squeezes</em> a wide set of lines back down to a short code — it is a decoder wired backwards, so the numbers swap sides: 2ⁿ inputs, n outputs. A multiplexer <em>chooses</em> — it needs n select lines to name one of 2ⁿ data inputs, but however big it gets, it only ever has to point at one thing at a time, so <b>its output count never changes: it is always exactly 1.</b> That last point is the one CAPE questions try to catch you on — a bigger multiplexer means more inputs and more select lines, never more outputs.</div>
+  </div>
 </div></section>
 
 <section id="test"><div class="wrap">
   <h2>Unit test</h2>
-  <p class="sub">Thirty questions. Nothing is saved, nothing is sent anywhere, nobody sees your score but you —
+  <p class="sub">Thirty-six questions. Nothing is saved, nothing is sent anywhere, nobody sees your score but you —
   so get it wrong as many times as you like. Every answer comes with a proper explanation, and at the end you get a
   breakdown showing exactly which bit to go back and look at.</p>
 
@@ -472,8 +487,8 @@ footer{margin-top:60px;border-top:1px solid var(--line);padding:26px 0 56px;colo
     <ul style="color:var(--ink2);font-size:.96rem;margin:0;padding-left:20px">
       <li><b>Part A</b> — guest list or ban list (7 questions)</li>
       <li><b>Part B</b> — adding (11)</li>
-      <li><b>Part C</b> — choosing (6)</li>
-      <li><b>Part D</b> — decoding and encoding (6)</li>
+      <li><b>Part C</b> — choosing (8)</li>
+      <li><b>Part D</b> — decoding and encoding (10)</li>
     </ul>
     <p style="font-size:.9rem;color:var(--ink3);margin-top:14px">Grab a scrap of paper. A couple of these are much
     easier if you scribble the columns out than if you try to hold it all in your head.</p>
@@ -881,6 +896,25 @@ $('#encCtl').addEventListener('click',e=>{
 });
 enDraw();
 
+/* ================= MUX / DECODER / ENCODER I-O SIZING ================= */
+let ioN=3;
+function ioDraw(){
+  const pow=1<<ioN;
+  $('#ioTabs').innerHTML=[1,2,3,4,5,6].map(n=>
+    `<button class="tab" data-n="${n}" aria-pressed="${n===ioN}">n = ${n}</button>`).join('');
+  const row=(label,inputs,outputs,note)=>`<tr><td style="font-weight:700">${label}</td>
+    <td class="m">${inputs}</td><td class="m">${outputs}</td><td style="font-size:.86rem;color:var(--ink2)">${note}</td></tr>`;
+  $('#ioTable').innerHTML=`<table class="tt" style="width:100%">
+    <thead><tr><th style="text-align:left">Circuit</th><th>Inputs</th><th>Outputs</th><th style="text-align:left">Why</th></tr></thead>
+    <tbody>
+      ${row('Multiplexer', pow+' data + '+ioN+' select', 1, ioN+' select line'+(ioN>1?'s':'')+' choose 1 of '+pow+' — output count never moves off 1')}
+      ${row('Decoder', ioN, pow, 'n inputs spread out to 2ⁿ outputs, exactly one of which switches on')}
+      ${row('Encoder', pow, ioN, 'the decoder’s wiring run backwards: 2ⁿ inputs squeeze down to n outputs')}
+    </tbody></table>`;
+}
+$('#ioTabs').addEventListener('click',e=>{const b=e.target.closest('[data-n]');if(b){ioN=+b.dataset.n;ioDraw();}});
+ioDraw();
+
 /* ================= UNIT TEST ================= */
 const PARTS={A:'Guest list or ban list',B:'Adding',C:'Choosing',D:'Decoding'};
 const Q=[
@@ -944,6 +978,18 @@ const Q=[
  why:'A·B = 0. A⊕B = 1, so Cin·(A⊕B) = 1. Then 0 + 1 = 1. Check it against the arithmetic: 1 + 0 + 1 = 2, which is binary 10, so sum 0 and carry 1. The algebra and the counting agree, as they must.'},
 {p:'B',q:'A 4-bit adder computes 15 + 1. The sum outputs read 0000 and the carry out reads 1. What has occurred?',opts:['A hardware fault','Arithmetic overflow — the true result needs a fifth bit','The adder has reset itself','Nothing unusual; 15 + 1 is 0'],a:1,
  why:'Four bits represent only 0 to 15, so 16 does not fit. The carry out is the adder reporting that the true answer exceeded its width. In a real processor that line sets a flag the program can test, which is how overflow gets caught rather than silently corrupting a result.'},
+{p:'C',q:'A multiplexer has 64 data inputs. How many select lines does it need?',opts:['4','6','8','32'],a:1,
+ why:'64 = 2⁶, so six select lines. However big the number of data inputs gets, always convert it to a power of two first and read off the exponent.'},
+{p:'C',q:'A multiplexer is expanded from 8 data inputs to 32 data inputs. What happens to its number of outputs?',opts:['It grows from 1 to 4','It grows from 3 to 5','It stays at exactly 1','It doubles to 2'],a:2,
+ why:'This is the trap. Only the data inputs and the select lines (3 → 5) grow. A multiplexer chooses one thing out of many — it never has more than a single output, no matter how large it gets.'},
+{p:'D',q:'A decoder has 5 input lines. How many output lines does it have?',opts:['5','10','16','32'],a:3,
+ why:'n inputs give 2ⁿ outputs, and 2⁵ = 32. Exactly one of those thirty-two switches on for any given input code.'},
+{p:'D',q:'A system needs a decoder with 64 distinct output lines, one per memory chip. How many input (address) lines does that decoder need?',opts:['4','6','8','32'],a:1,
+ why:'Run the rule backwards: 2ⁿ = 64 means n = 6. Whenever a question gives you the outputs first, ask "2 to what power gives me this number" — that power is the input count.'},
+{p:'D',q:'An encoder must represent 32 different input buttons using as few output lines as possible. How many output lines does it need?',opts:['4','5','6','16'],a:1,
+ why:'32 = 2⁵, so five output lines. An encoder is a decoder wired backwards, so the same power-of-two count applies — it just lands on the output side instead of the input side.'},
+{p:'D',q:'An encoder has 4 output lines. What is the largest number of input lines it could be handling?',opts:['4','8','16','32'],a:2,
+ why:'Four output lines can represent 2⁴ = 16 different codes, so at most 16 inputs. Go the other way from decoders and encoders and you are simply asking "what is 2 raised to the number of wires I was given".'},
 ];
 let T={order:[],i:0,answers:{}};
 const grade=p=>p>=85?'A':p>=75?'B':p>=65?'C':p>=50?'D':'F';
