@@ -18,7 +18,7 @@
 <meta name="lesson:sections"   content="9">
 <meta name="lesson:topics"     content="Half adder,Full adder,Ripple carry,Multiplexer,Decoder,Encoder,Seven-segment,Binary addition">
 <meta name="lesson:activities" content="Adder bench,Guest list or ban list,Adder lab,Logic.ly lab,Domino carry,HDMI switch,Microwave clock,Buzzer test,Unit test">
-<meta name="lesson:updated"    content="2026-09-16">
+<meta name="lesson:updated"    content="2026-09-18">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -144,10 +144,19 @@ footer{margin-top:60px;border-top:1px solid var(--line);padding:26px 0 56px;colo
   <p class="lede">Your phone does not know what seven is. There is no little seven hiding anywhere inside it.
   There are switches, on and off, wired together so cleverly that the right answer falls out the other end.
   In this topic those switches stop being an exercise and start being real things: a calculator, a TV remote,
-  the clock on your microwave. Start by playing with the thing below. It adds. That is all it does, and everything
-  else your phone does is built on top of it.</p>
+  the clock on your microwave. Below is the simplest one there is — an adder — and everything else your phone
+  does is built on top of it.</p>
 
-  <div class="panel" style="margin-top:26px">
+  <div class="analogy" style="margin-top:22px">
+    <h4>Before you touch it — one thing to know about "carry"</h4>
+    <p>Binary has exactly two digits: 0 and 1. Nothing else — no 2, ever. So the moment a column needs to add
+    1 + 1, there is no digit left to write the answer with. It does exactly what your own counting does at 9 + 1:
+    write down a 0 and carry a 1 into the next column along. In binary that happens on almost every column, not
+    just every ten, which is why you are about to see <span class="mono">carry</span> lighting up constantly below.
+    That is the whole idea — watch for it, and the rest of this topic explains it properly in a minute.</p>
+  </div>
+
+  <div class="panel" style="margin-top:22px">
     <h3 style="margin-bottom:4px">An adder. A real one.</h3>
     <p style="font-size:.92rem;color:var(--ink2);margin-bottom:16px">Click any bit to flip it and the sum updates instantly.
     Nothing here is a simulation of a calculator — this is the actual wiring pattern, and there is a copy of it in
@@ -169,8 +178,10 @@ footer{margin-top:60px;border-top:1px solid var(--line);padding:26px 0 56px;colo
 
 <section id="sop"><div class="wrap">
   <h2>The guest list and the ban list</h2>
-  <p class="sub">Last topic you learned to look at the 1s. There is a second way that looks at the 0s instead, and
-  sometimes it saves you an enormous amount of work. Which one you pick depends entirely on which list is shorter.</p>
+  <p class="sub">Last topic you learned to look at the 1s and build what is properly called a <b>Sum of Products</b>
+  circuit — <b>SOP</b> for short, the same method, just a name for it now. There is a second way that looks at the
+  0s instead, called <b>Product of Sums</b> — <b>POS</b> — and sometimes it saves you an enormous amount of work.
+  Which one you pick depends entirely on which list is shorter.</p>
 
   <div class="analogy">
     <h4>You are on the door at a party</h4>
@@ -658,7 +669,7 @@ function haDraw(){
   g+=gsvg('XOR',78,18,52,48,'var(--violet)')+gsvg('AND',78,84,52,48,'var(--red)');
   g+=wire(136,42,210,42,s)+gtxt(216,46,'Sum = A\u2295B','var(--ink)');
   g+=wire(132,108,210,108,c)+gtxt(216,112,'Carry = A\u00b7B','var(--ink)');
-  $('#haSvg').innerHTML=`<svg viewBox="0 0 340 150">${g}</svg>`;
+  $('#haSvg').innerHTML=`<svg viewBox="0 0 340 150" width="340" height="150">${g}</svg>`;
   $('#haTable').innerHTML=ttHTML(['A','B'],[0,1,1,0],{outName:'Sum',extraCols:[[0,0,0,1]],outs:['A','B','Sum','Carry'],hot:HA.a*2+HA.b});
 }
 $('#haCtl').addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(b){HA[b.dataset.t]^=1;haDraw();}});
@@ -689,7 +700,7 @@ function faDraw(){
   g+=wire(250,118,250,140,c1)+wire(250,204,250,168,c2)+wire(250,140,262,140,c1)+wire(250,168,262,168,c2);
   g+=gsvg('OR',262,128,48,52,'var(--amber)');
   g+=wire(312,154,320,154,co)+gtxt(324,158,'Cout','var(--ink)');
-  $('#faSvg').innerHTML=`<svg viewBox="0 0 380 240">${g}</svg>`;
+  $('#faSvg').innerHTML=`<svg viewBox="0 0 380 240" width="380" height="240">${g}</svg>`;
   const rows=rowsFor(3);
   $('#faTable').innerHTML=ttHTML(['A','B','Cin'],rows.map(([a,b,c])=>a^b^c),
     {outs:['A','B','Cin','Sum','Cout'],extraCols:[rows.map(([a,b,c])=>((a&b)|((a^b)&c))?1:0)],hot:FA.a*4+FA.b*2+FA.c});
@@ -763,7 +774,7 @@ function mxDraw(){
   }
   g+=gsvg('OR',158,84,50,54,'var(--violet)')+wire(208,111,262,111,y)+gtxt(266,115,'Y = '+y,'var(--ink)');
   g+=gtxt(60,232,'S1 S0 select which AND gate opens','var(--ink3)');
-  $('#muxSvg').innerHTML=`<svg viewBox="0 0 330 244">${g}</svg>`;
+  $('#muxSvg').innerHTML=`<svg viewBox="0 0 330 244" width="330" height="244">${g}</svg>`;
   $('#muxExpr').textContent='Y = S1\u2032S0\u2032D0 + S1\u2032S0D1 + S1S0\u2032D2 + S1S0D3';
   $('#muxTable').innerHTML=`<table class="tt"><thead><tr><th>S1</th><th>S0</th><th>Output Y</th></tr></thead><tbody>`
     +[0,1,2,3].map(i=>`<tr class="${i===sel?'hot':''}"><td>${i>>1}</td><td>${i&1}</td><td class="out">D${i} = ${MX.d[i]}</td></tr>`).join('')
@@ -821,7 +832,7 @@ function dcDraw(){
     g+=gsvg('AND',250,gy,42,34,on?'var(--amber)':'var(--line)');
     g+=wire(292,gy+17,330,gy+17,on)+gtxt(334,gy+21,'D'+i,on?'var(--ink)':'var(--ink3)');
   }
-  $('#decSvg').innerHTML=`<svg viewBox="0 0 370 300">${g}</svg>`;
+  $('#decSvg').innerHTML=`<svg viewBox="0 0 370 300" width="370" height="300">${g}</svg>`;
   $('#decTable').innerHTML=`<table class="tt"><thead><tr><th>A</th><th>B</th><th>D3</th><th>D2</th><th>D1</th><th>D0</th><th>Active</th></tr></thead><tbody>`
     +[0,1,2,3].map(i=>`<tr class="${i===sel?'hot':''}"><td>${i>>1}</td><td>${i&1}</td>
       ${[3,2,1,0].map(j=>`<td>${j===i?1:0}</td>`).join('')}<td class="out">D${i}</td></tr>`).join('')+`</tbody></table>`;
